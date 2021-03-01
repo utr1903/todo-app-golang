@@ -1,14 +1,15 @@
-package controllers
+package todoitemmodule
 
 import (
 	"net/http"
 
+	"github.com/todo-app-golang/controllers"
 	"github.com/todo-app-golang/services"
 )
 
 // TodoItemController : Controller for Todo Item Model
 type TodoItemController struct {
-	Base *Controller
+	Base *controllers.Controller
 }
 
 // GetItems : Handler for todo items
