@@ -1,6 +1,8 @@
 package services
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 // User : User model
 type User struct {
@@ -13,7 +15,7 @@ type User struct {
 type UserService struct{}
 
 // GetUsers : Returns all users
-func (us *UserService) GetUsers(db *sql.DB) ([]User, error) {
+func (s *UserService) GetUsers(db *sql.DB) ([]User, error) {
 	rows, err := db.Query("select * from users")
 	if err != nil {
 		return nil, err
@@ -32,4 +34,19 @@ func (us *UserService) GetUsers(db *sql.DB) ([]User, error) {
 	}
 
 	return users, nil
+}
+
+// GetUser : Returns user with given ID
+func (s *UserService) GetUser(db *sql.DB, userID string) (*User, error) {
+	user := &User{}
+
+	q := "select * from users where id = ?"
+	err := db.QueryRow(q, userID).
+		Scan(&user.ID, &user.UserName, &user.Password)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

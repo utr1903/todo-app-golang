@@ -12,13 +12,17 @@ type Controller struct {
 }
 
 // ParseRequest : Generic way for all controllers to parse JSON request
-func (c *Controller) ParseRequest(w http.ResponseWriter, r *http.Request, dto *interface{}) {
+func (c *Controller) ParseRequest(w http.ResponseWriter, r *http.Request) map[string]interface{} {
+	var dto map[string]interface{}
+
 	decoder := json.NewDecoder(r.Body)
-	if decoder.Decode(dto) != nil {
+	if decoder.Decode(&dto) != nil {
 		c.CreateResponse(w, http.StatusBadRequest, "Invalid request payload")
-		return
+		return nil
 	}
 	defer r.Body.Close()
+
+	return dto
 }
 
 // CreateResponse : Generic way for all controllers to create JSON response

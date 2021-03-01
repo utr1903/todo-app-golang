@@ -1,6 +1,7 @@
 package todoitemmodule
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/todo-app-golang/controllers"
@@ -22,4 +23,24 @@ func (c *TodoItemController) GetItems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.Base.CreateResponse(w, http.StatusOK, users)
+}
+
+// GetItem : Handler for getting item with given ID
+func (c *TodoItemController) GetItem(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequest(w, r)
+	itemID, ok := dto["itemId"].(string)
+
+	if !ok {
+		log.Fatal("ItemID is not valid")
+	}
+
+	s := &services.TodoItemService{}
+
+	item, err := s.GetItem(c.Base.Db, itemID)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, item)
 }

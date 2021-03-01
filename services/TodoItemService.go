@@ -13,7 +13,7 @@ type TodoItem struct {
 type TodoItemService struct{}
 
 // GetItems : Returns all items
-func (tls *TodoItemService) GetItems(db *sql.DB) ([]TodoItem, error) {
+func (s *TodoItemService) GetItems(db *sql.DB) ([]TodoItem, error) {
 	rows, err := db.Query("select * from items")
 	if err != nil {
 		return nil, err
@@ -32,4 +32,19 @@ func (tls *TodoItemService) GetItems(db *sql.DB) ([]TodoItem, error) {
 	}
 
 	return items, nil
+}
+
+// GetItem : Returns item with given ID
+func (s *TodoItemService) GetItem(db *sql.DB, itemID string) (*TodoItem, error) {
+	item := &TodoItem{}
+
+	q := "select * from items where id = ?"
+	err := db.QueryRow(q, itemID).
+		Scan(&item.ID, &item.ListID, &item.Content)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }

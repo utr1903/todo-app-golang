@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	app := &app.App{}
-	app.InitDb()
-	app.InitControllers()
-	app.Serve()
+	a := &app.App{}
+	a.InitDb()
+	a.InitControllers()
+	a.Serve()
 }

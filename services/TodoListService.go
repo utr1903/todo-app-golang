@@ -13,7 +13,7 @@ type TodoList struct {
 type TodoListService struct{}
 
 // GetLists : Returns all lists
-func (tls *TodoListService) GetLists(db *sql.DB) ([]TodoList, error) {
+func (s *TodoListService) GetLists(db *sql.DB) ([]TodoList, error) {
 	rows, err := db.Query("select * from lists")
 	if err != nil {
 		return nil, err
@@ -32,4 +32,19 @@ func (tls *TodoListService) GetLists(db *sql.DB) ([]TodoList, error) {
 	}
 
 	return lists, nil
+}
+
+// GetList : Returns list with given ID
+func (s *TodoListService) GetList(db *sql.DB, itemID string) (*TodoList, error) {
+	list := &TodoList{}
+
+	q := "select * from lists where id = ?"
+	err := db.QueryRow(q, itemID).
+		Scan(&list.ID, &list.UserID, &list.Name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
 }

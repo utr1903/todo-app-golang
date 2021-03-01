@@ -46,19 +46,25 @@ func (a *App) InitControllers() {
 func initUserController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &usersmodule.UsersController{Base: b}
+
 	a.Router.HandleFunc("/users", c.GetUsers).Methods("GET")
+	a.Router.HandleFunc("/user", c.GetUser).Methods("POST")
 }
 
 func initTodoListController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &todolistmodule.TodoListController{Base: b}
+
 	a.Router.HandleFunc("/lists", c.GetLists).Methods("GET")
+	a.Router.HandleFunc("/list", c.GetList).Methods("POST")
 }
 
 func initTodoItemController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &todoitemmodule.TodoItemController{Base: b}
+
 	a.Router.HandleFunc("/items", c.GetItems).Methods("GET")
+	a.Router.HandleFunc("/item", c.GetItem).Methods("POST")
 }
 
 // Serve : Runs web server
