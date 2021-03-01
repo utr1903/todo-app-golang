@@ -3,7 +3,6 @@ package app
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -18,11 +17,6 @@ import (
 type App struct {
 	Db     *sql.DB
 	Router *mux.Router
-}
-
-// Hi : For test purposes
-func (a *App) Hi() {
-	fmt.Println("Hi")
 }
 
 // InitDb : Initializes the Db connection
@@ -42,12 +36,13 @@ func (a *App) InitControllers() {
 	r := mux.NewRouter()
 	r.HandleFunc("/users", a.getUsers).Methods("GET")
 	r.HandleFunc("/lists", a.getLists).Methods("GET")
+	r.HandleFunc("/items", a.getItems).Methods("GET")
 	a.Router = r
 }
 
 func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
-	us := &services.UserService{}
-	users, err := us.GetUsers(a.Db)
+	s := &services.UserService{}
+	users, err := s.GetUsers(a.Db)
 
 	if err != nil {
 		createResponse(w, http.StatusBadRequest, nil)
@@ -57,14 +52,25 @@ func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) getLists(w http.ResponseWriter, r *http.Request) {
-	tls := &services.TodoListService{}
-	lists, err := tls.GetLists(a.Db)
+	s := &services.TodoListService{}
+	lists, err := s.GetLists(a.Db)
 
 	if err != nil {
 		createResponse(w, http.StatusBadRequest, nil)
 	}
 
 	createResponse(w, http.StatusOK, lists)
+}
+
+func (a *App) getItems(w http.ResponseWriter, r *http.Request) {
+	s := &services.TodoItemService{}
+	items, err := s.GetLists(a.Db)
+
+	if err != nil {
+		createResponse(w, http.StatusBadRequest, nil)
+	}
+
+	createResponse(w, http.StatusOK, items)
 }
 
 func createResponse(w http.ResponseWriter, code int, dto interface{}) {

@@ -6,7 +6,6 @@ import (
 
 func main() {
 	app := &app.App{}
-	app.Hi()
 	app.InitDb()
 	app.InitControllers()
 	app.Serve()
