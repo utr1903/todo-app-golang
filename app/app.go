@@ -2,7 +2,6 @@ package app
 
 import (
 	"database/sql"
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -10,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 
-	"github.com/todo-app-golang/services"
+	"github.com/todo-app-golang/controllers"
 )
 
 // App : DB and Controllers
@@ -34,51 +33,29 @@ func (a *App) InitDb() {
 // InitControllers : Initializes the controllers
 func (a *App) InitControllers() {
 	r := mux.NewRouter()
-	r.HandleFunc("/users", a.getUsers).Methods("GET")
-	r.HandleFunc("/lists", a.getLists).Methods("GET")
-	r.HandleFunc("/items", a.getItems).Methods("GET")
 	a.Router = r
+
+	initUserController(a)
+	initTodoListController(a)
+	initTodoItemController(a)
 }
 
-func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
-	s := &services.UserService{}
-	users, err := s.GetUsers(a.Db)
-
-	if err != nil {
-		createResponse(w, http.StatusBadRequest, nil)
-	}
-
-	createResponse(w, http.StatusOK, users)
+func initUserController(a *App) {
+	b := &controllers.Controller{Db: a.Db}
+	c := &controllers.UsersController{Base: b}
+	a.Router.HandleFunc("/users", c.GetUsers).Methods("GET")
 }
 
-func (a *App) getLists(w http.ResponseWriter, r *http.Request) {
-	s := &services.TodoListService{}
-	lists, err := s.GetLists(a.Db)
-
-	if err != nil {
-		createResponse(w, http.StatusBadRequest, nil)
-	}
-
-	createResponse(w, http.StatusOK, lists)
+func initTodoListController(a *App) {
+	b := &controllers.Controller{Db: a.Db}
+	c := &controllers.TodoListController{Base: b}
+	a.Router.HandleFunc("/lists", c.GetLists).Methods("GET")
 }
 
-func (a *App) getItems(w http.ResponseWriter, r *http.Request) {
-	s := &services.TodoItemService{}
-	items, err := s.GetLists(a.Db)
-
-	if err != nil {
-		createResponse(w, http.StatusBadRequest, nil)
-	}
-
-	createResponse(w, http.StatusOK, items)
-}
-
-func createResponse(w http.ResponseWriter, code int, dto interface{}) {
-	response, _ := json.Marshal(dto)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(response)
+func initTodoItemController(a *App) {
+	b := &controllers.Controller{Db: a.Db}
+	c := &controllers.TodoItemController{Base: b}
+	a.Router.HandleFunc("/items", c.GetItems).Methods("GET")
 }
 
 // Serve : Runs web server

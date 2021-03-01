@@ -12,8 +12,8 @@ type TodoItem struct {
 // TodoItemService : Implementation of TodoItemService
 type TodoItemService struct{}
 
-// GetLists : Returns all lists
-func (tls *TodoItemService) GetLists(db *sql.DB) ([]TodoItem, error) {
+// GetItems : Returns all items
+func (tls *TodoItemService) GetItems(db *sql.DB) ([]TodoItem, error) {
 	rows, err := db.Query("select * from items")
 	if err != nil {
 		return nil, err
