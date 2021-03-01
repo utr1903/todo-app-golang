@@ -11,7 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 
-	userService "github.com/todo-app-golang/services"
+	"github.com/todo-app-golang/services"
 )
 
 // App : DB and Controllers
@@ -41,19 +41,30 @@ func (a *App) InitDb() {
 func (a *App) InitControllers() {
 	r := mux.NewRouter()
 	r.HandleFunc("/users", a.getUsers).Methods("GET")
+	r.HandleFunc("/lists", a.getLists).Methods("GET")
 	a.Router = r
 }
 
 func (a *App) getUsers(w http.ResponseWriter, r *http.Request) {
-	us := &userService.UserService{}
+	us := &services.UserService{}
 	users, err := us.GetUsers(a.Db)
-	fmt.Println(&users)
 
 	if err != nil {
 		createResponse(w, http.StatusBadRequest, nil)
 	}
 
 	createResponse(w, http.StatusOK, users)
+}
+
+func (a *App) getLists(w http.ResponseWriter, r *http.Request) {
+	tls := &services.TodoListService{}
+	lists, err := tls.GetLists(a.Db)
+
+	if err != nil {
+		createResponse(w, http.StatusBadRequest, nil)
+	}
+
+	createResponse(w, http.StatusOK, lists)
 }
 
 func createResponse(w http.ResponseWriter, code int, dto interface{}) {

@@ -25,7 +25,7 @@ func (us *UserService) GetUsers(db *sql.DB) ([]User, error) {
 
 	for rows.Next() {
 		var user User
-		if err := rows.Scan(&user.ID, &user.UserName, &user.Password); err != nil {
+		if rows.Scan(&user.ID, &user.UserName, &user.Password) != nil {
 			return nil, err
 		}
 		users = append(users, user)
