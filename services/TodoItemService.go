@@ -60,6 +60,14 @@ func (s *TodoItemService) GetItem(db *sql.DB, itemID string) (*TodoItem, error) 
 // CreateTodoItem : Creates a new todo item
 func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, error) {
 
+	todoItem := &TodoItem{}
+	json.Unmarshal([]byte(*dto), &todoItem)
+
+	// Check whether to be created list is assigning to an existing user
+	if !s.doesListExist(db, &todoItem.ListID) {
+		return nil, nil
+	}
+
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
 
@@ -70,9 +78,6 @@ func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, erro
 		return nil, err
 	}
 	defer stmt.Close()
-
-	todoItem := &TodoItem{}
-	json.Unmarshal([]byte(*dto), &todoItem)
 
 	itemID := uuid.New().String()
 	res, err := stmt.ExecContext(ctx, itemID, todoItem.ListID, todoItem.Content)
@@ -86,4 +91,14 @@ func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, erro
 	}
 
 	return &itemID, nil
+}
+
+func (s *TodoItemService) doesListExist(db *sql.DB, listID *string) bool {
+	q := "select id from lists where id = ?"
+	err := db.QueryRow(q, listID).Scan()
+	if err != nil {
+		return false
+	}
+
+	return true
 }

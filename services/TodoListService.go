@@ -60,6 +60,14 @@ func (s *TodoListService) GetList(db *sql.DB, itemID string) (*TodoList, error) 
 // CreateTodoList : Creates a new todo list
 func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, error) {
 
+	todoList := &TodoList{}
+	json.Unmarshal([]byte(*dto), &todoList)
+
+	// Check whether to be created list is assigning to an existing user
+	if !s.doesUserExist(db, &todoList.UserID) {
+		return nil, nil
+	}
+
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
 
@@ -70,9 +78,6 @@ func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, erro
 		return nil, err
 	}
 	defer stmt.Close()
-
-	todoList := &TodoList{}
-	json.Unmarshal([]byte(*dto), &todoList)
 
 	listID := uuid.New().String()
 	res, err := stmt.ExecContext(ctx, listID, todoList.UserID, todoList.Name)
@@ -86,4 +91,14 @@ func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, erro
 	}
 
 	return &listID, nil
+}
+
+func (s *TodoListService) doesUserExist(db *sql.DB, userID *string) bool {
+	q := "select id from users where id = ?"
+	err := db.QueryRow(q, userID).Scan()
+	if err != nil {
+		return false
+	}
+
+	return true
 }
