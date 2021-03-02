@@ -87,3 +87,49 @@ func (s *UserService) CreateUser(db *sql.DB, dto *string) (*string, error) {
 
 	return &userID, nil
 }
+
+// UpdateUser : Updates an existing user
+func (s *UserService) UpdateUser(db *sql.DB, dto *string) error {
+
+	user := &User{}
+	json.Unmarshal([]byte(*dto), &user)
+
+	// Check whether to be created list is assigning to an existing user
+	if !s.doesUserExist(db, &user.ID) {
+		return nil
+	}
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+
+	q := "update users set username = ?, password = ? where id = ?"
+	stmt, err := db.PrepareContext(ctx, q)
+	if err != nil {
+		log.Printf("Error %s when preparing SQL statement", err)
+		return err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.ExecContext(ctx, user.UserName, user.Password, user.ID)
+	if err != nil {
+		return err
+	}
+
+	numRows, err := res.RowsAffected()
+	if numRows != 1 || err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *UserService) doesUserExist(db *sql.DB, userID *string) bool {
+	q := "select id from users where id = ?"
+	var userExists string
+	err := db.QueryRow(q, userID).Scan(&userExists)
+	if err != nil {
+		return false
+	}
+
+	return true
+}

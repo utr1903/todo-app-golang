@@ -49,7 +49,8 @@ func initUserController(a *App) {
 
 	a.Router.HandleFunc("/users/get", c.GetUsers).Methods("GET")
 	a.Router.HandleFunc("/users/create", c.CreateUser).Methods("POST")
-	a.Router.HandleFunc("/user/update", c.GetUser).Methods("POST")
+	a.Router.HandleFunc("/user/get", c.GetUser).Methods("POST")
+	a.Router.HandleFunc("/user/update", c.UpdateUser).Methods("POST")
 }
 
 func initTodoListController(a *App) {

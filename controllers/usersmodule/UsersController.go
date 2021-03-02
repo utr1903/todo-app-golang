@@ -61,3 +61,18 @@ func (c *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	c.Base.CreateResponse(w, http.StatusOK, userID)
 }
+
+// UpdateUser : Handler for updating an existing user
+func (c *UsersController) UpdateUser(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.UserService{}
+
+	err := s.UpdateUser(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, nil)
+}
