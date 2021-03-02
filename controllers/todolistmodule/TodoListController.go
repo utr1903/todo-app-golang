@@ -44,3 +44,18 @@ func (c *TodoListController) GetList(w http.ResponseWriter, r *http.Request) {
 
 	c.Base.CreateResponse(w, http.StatusOK, list)
 }
+
+// CreateTodoList : Handler for creating new list
+func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.TodoListService{}
+
+	listID, err := s.CreateTodoList(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, listID)
+}

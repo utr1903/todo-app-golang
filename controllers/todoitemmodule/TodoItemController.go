@@ -44,3 +44,18 @@ func (c *TodoItemController) GetItem(w http.ResponseWriter, r *http.Request) {
 
 	c.Base.CreateResponse(w, http.StatusOK, item)
 }
+
+// CreateTodoItem : Handler for creating new item
+func (c *TodoItemController) CreateTodoItem(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.TodoItemService{}
+
+	itemID, err := s.CreateTodoItem(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, itemID)
+}
