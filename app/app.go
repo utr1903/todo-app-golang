@@ -48,6 +48,7 @@ func initUserController(a *App) {
 	c := &usersmodule.UsersController{Base: b}
 
 	a.Router.HandleFunc("/users", c.GetUsers).Methods("GET")
+	a.Router.HandleFunc("/users", c.CreateUser).Methods("POST")
 	a.Router.HandleFunc("/user", c.GetUser).Methods("POST")
 }
 

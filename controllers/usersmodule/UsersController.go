@@ -30,7 +30,7 @@ func (c *UsersController) GetUsers(w http.ResponseWriter, r *http.Request) {
 // GetUser : Handler for getting user with given ID
 func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequest(w, r)
+	dto := c.Base.ParseRequestToMap(w, r)
 	userID, ok := dto["userId"].(string)
 
 	if !ok {
@@ -45,4 +45,19 @@ func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.Base.CreateResponse(w, http.StatusOK, user)
+}
+
+// CreateUser : Handler for creating new user
+func (c *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.UserService{}
+
+	userID, err := s.CreateUser(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, userID)
 }

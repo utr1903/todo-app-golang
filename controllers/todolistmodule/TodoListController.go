@@ -28,7 +28,7 @@ func (c *TodoListController) GetLists(w http.ResponseWriter, r *http.Request) {
 // GetList : Handler for getting list with given ID
 func (c *TodoListController) GetList(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequest(w, r)
+	dto := c.Base.ParseRequestToMap(w, r)
 	listID, ok := dto["listId"].(string)
 
 	if !ok {

@@ -1,6 +1,14 @@
 package services
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"log"
+	"time"
+
+	"github.com/google/uuid"
+)
 
 // TodoItem : TodoList model
 type TodoItem struct {
@@ -47,4 +55,35 @@ func (s *TodoItemService) GetItem(db *sql.DB, itemID string) (*TodoItem, error) 
 	}
 
 	return item, nil
+}
+
+// CreateTodoItem : Creates a new todo item
+func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, error) {
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+
+	q := "insert into items (id, listid, content) values (?, ?, ?)"
+	stmt, err := db.PrepareContext(ctx, q)
+	if err != nil {
+		log.Printf("Error %s when preparing SQL statement", err)
+		return nil, err
+	}
+	defer stmt.Close()
+
+	todoItem := &TodoItem{}
+	json.Unmarshal([]byte(*dto), &todoItem)
+
+	itemID := uuid.New().String()
+	res, err := stmt.ExecContext(ctx, itemID, todoItem.ListID, todoItem.Content)
+	if err != nil {
+		return nil, err
+	}
+
+	numRows, err := res.RowsAffected()
+	if numRows != 1 || err != nil {
+		return nil, err
+	}
+
+	return &itemID, nil
 }

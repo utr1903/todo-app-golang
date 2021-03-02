@@ -28,7 +28,7 @@ func (c *TodoItemController) GetItems(w http.ResponseWriter, r *http.Request) {
 // GetItem : Handler for getting item with given ID
 func (c *TodoItemController) GetItem(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequest(w, r)
+	dto := c.Base.ParseRequestToMap(w, r)
 	itemID, ok := dto["itemId"].(string)
 
 	if !ok {
