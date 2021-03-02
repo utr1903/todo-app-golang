@@ -13,7 +13,7 @@ type TodoListController struct {
 	Base *controllers.Controller
 }
 
-// GetLists : Handler for todo lists
+// GetLists : Handler for all todo lists
 func (c *TodoListController) GetLists(w http.ResponseWriter, r *http.Request) {
 	s := &services.TodoListService{}
 	users, err := s.GetLists(c.Base.Db)
@@ -25,7 +25,7 @@ func (c *TodoListController) GetLists(w http.ResponseWriter, r *http.Request) {
 	c.Base.CreateResponse(w, http.StatusOK, users)
 }
 
-// GetList : Handler for getting list with given ID
+// GetList : Handler for getting a list with given ID
 func (c *TodoListController) GetList(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToMap(w, r)
@@ -45,7 +45,7 @@ func (c *TodoListController) GetList(w http.ResponseWriter, r *http.Request) {
 	c.Base.CreateResponse(w, http.StatusOK, list)
 }
 
-// CreateTodoList : Handler for creating new list
+// CreateTodoList : Handler for creating a new list
 func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
@@ -58,4 +58,19 @@ func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Reque
 	}
 
 	c.Base.CreateResponse(w, http.StatusOK, listID)
+}
+
+// UpdateTodoList : Handler for updating an existing list
+func (c *TodoListController) UpdateTodoList(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.TodoListService{}
+
+	err := s.UpdateTodoList(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, nil)
 }

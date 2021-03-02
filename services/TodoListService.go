@@ -93,10 +93,56 @@ func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, erro
 	return &listID, nil
 }
 
+// UpdateTodoList : Updates an existing todo list
+func (s *TodoListService) UpdateTodoList(db *sql.DB, dto *string) error {
+
+	todoList := &TodoList{}
+	json.Unmarshal([]byte(*dto), &todoList)
+
+	// Check whether to be created list is assigning to an existing user
+	if !s.doesListExist(db, &todoList.ID) {
+		return nil
+	}
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+
+	q := "update lists set name = ? where id = ?"
+	stmt, err := db.PrepareContext(ctx, q)
+	if err != nil {
+		log.Printf("Error %s when preparing SQL statement", err)
+		return err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.ExecContext(ctx, todoList.Name, todoList.ID)
+	if err != nil {
+		return err
+	}
+
+	numRows, err := res.RowsAffected()
+	if numRows != 1 || err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *TodoListService) doesUserExist(db *sql.DB, userID *string) bool {
 	q := "select id from users where id = ?"
 	var userExists string
 	err := db.QueryRow(q, userID).Scan(&userExists)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func (s *TodoListService) doesListExist(db *sql.DB, listID *string) bool {
+	q := "select id from lists where id = ?"
+	var listExists string
+	err := db.QueryRow(q, listID).Scan(&listExists)
 	if err != nil {
 		return false
 	}

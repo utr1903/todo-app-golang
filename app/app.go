@@ -58,7 +58,8 @@ func initTodoListController(a *App) {
 
 	a.Router.HandleFunc("/lists/get", c.GetLists).Methods("GET")
 	a.Router.HandleFunc("/lists/create", c.CreateTodoList).Methods("POST")
-	a.Router.HandleFunc("/list/update", c.GetList).Methods("POST")
+	a.Router.HandleFunc("/list/get", c.GetList).Methods("POST")
+	a.Router.HandleFunc("/list/update", c.UpdateTodoList).Methods("POST")
 }
 
 func initTodoItemController(a *App) {
