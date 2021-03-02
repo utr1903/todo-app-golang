@@ -13,8 +13,8 @@ type TodoItemController struct {
 	Base *controllers.Controller
 }
 
-// GetItems : Handler for todo items
-func (c *TodoItemController) GetItems(w http.ResponseWriter, r *http.Request) {
+// GetTodoItems : Handler for getting all todo items
+func (c *TodoItemController) GetTodoItems(w http.ResponseWriter, r *http.Request) {
 	s := &services.TodoItemService{}
 	users, err := s.GetItems(c.Base.Db)
 
@@ -25,8 +25,8 @@ func (c *TodoItemController) GetItems(w http.ResponseWriter, r *http.Request) {
 	c.Base.CreateResponse(w, http.StatusOK, users)
 }
 
-// GetItem : Handler for getting item with given ID
-func (c *TodoItemController) GetItem(w http.ResponseWriter, r *http.Request) {
+// GetTodoItem : Handler for getting an item with given ID
+func (c *TodoItemController) GetTodoItem(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToMap(w, r)
 	itemID, ok := dto["itemId"].(string)
@@ -45,7 +45,7 @@ func (c *TodoItemController) GetItem(w http.ResponseWriter, r *http.Request) {
 	c.Base.CreateResponse(w, http.StatusOK, item)
 }
 
-// CreateTodoItem : Handler for creating new item
+// CreateTodoItem : Handler for creating a new item
 func (c *TodoItemController) CreateTodoItem(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
@@ -58,4 +58,19 @@ func (c *TodoItemController) CreateTodoItem(w http.ResponseWriter, r *http.Reque
 	}
 
 	c.Base.CreateResponse(w, http.StatusOK, itemID)
+}
+
+// UpdateTodoItem : Handler for updating an existing item
+func (c *TodoItemController) UpdateTodoItem(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.TodoItemService{}
+
+	err := s.UpdateTodoItem(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, nil)
 }

@@ -95,7 +95,8 @@ func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, erro
 
 func (s *TodoListService) doesUserExist(db *sql.DB, userID *string) bool {
 	q := "select id from users where id = ?"
-	err := db.QueryRow(q, userID).Scan()
+	var userExists string
+	err := db.QueryRow(q, userID).Scan(&userExists)
 	if err != nil {
 		return false
 	}

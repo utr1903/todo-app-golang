@@ -47,27 +47,28 @@ func initUserController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &usersmodule.UsersController{Base: b}
 
-	a.Router.HandleFunc("/users", c.GetUsers).Methods("GET")
-	a.Router.HandleFunc("/users", c.CreateUser).Methods("POST")
-	a.Router.HandleFunc("/user", c.GetUser).Methods("POST")
+	a.Router.HandleFunc("/users/get", c.GetUsers).Methods("GET")
+	a.Router.HandleFunc("/users/create", c.CreateUser).Methods("POST")
+	a.Router.HandleFunc("/user/update", c.GetUser).Methods("POST")
 }
 
 func initTodoListController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &todolistmodule.TodoListController{Base: b}
 
-	a.Router.HandleFunc("/lists", c.GetLists).Methods("GET")
-	a.Router.HandleFunc("/lists", c.CreateTodoList).Methods("POST")
-	a.Router.HandleFunc("/list", c.GetList).Methods("POST")
+	a.Router.HandleFunc("/lists/get", c.GetLists).Methods("GET")
+	a.Router.HandleFunc("/lists/create", c.CreateTodoList).Methods("POST")
+	a.Router.HandleFunc("/list/update", c.GetList).Methods("POST")
 }
 
 func initTodoItemController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &todoitemmodule.TodoItemController{Base: b}
 
-	a.Router.HandleFunc("/items", c.GetItems).Methods("GET")
-	a.Router.HandleFunc("/items", c.CreateTodoItem).Methods("POST")
-	a.Router.HandleFunc("/item", c.GetItem).Methods("POST")
+	a.Router.HandleFunc("/items/get", c.GetTodoItems).Methods("GET")
+	a.Router.HandleFunc("/items/create", c.CreateTodoItem).Methods("POST")
+	a.Router.HandleFunc("/item/get", c.GetTodoItem).Methods("POST")
+	a.Router.HandleFunc("/item/update", c.UpdateTodoItem).Methods("POST")
 }
 
 // Serve : Runs web server
