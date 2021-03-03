@@ -128,6 +128,41 @@ func (s *TodoItemService) UpdateTodoItem(db *sql.DB, dto *string) error {
 	return nil
 }
 
+// DeleteTodoItem : Deletes an existing item
+func (s *TodoItemService) DeleteTodoItem(db *sql.DB, dto *string) error {
+
+	var itemID string
+	json.Unmarshal([]byte(*dto), &itemID)
+
+	// Check whether to be created list is assigning to an existing user
+	if !s.doesItemExist(db, &itemID) {
+		return nil
+	}
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+
+	q := "delete from items where id = ?"
+	stmt, err := db.PrepareContext(ctx, q)
+	if err != nil {
+		log.Printf("Error %s when preparing SQL statement", err)
+		return err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.ExecContext(ctx, itemID)
+	if err != nil {
+		return err
+	}
+
+	numRows, err := res.RowsAffected()
+	if numRows != 1 || err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *TodoItemService) doesListExist(db *sql.DB, listID *string) bool {
 	q := "select id from lists where id = ?"
 	var listExists string

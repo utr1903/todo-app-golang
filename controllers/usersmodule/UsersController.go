@@ -76,3 +76,18 @@ func (c *UsersController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	c.Base.CreateResponse(w, http.StatusOK, nil)
 }
+
+// DeleteUser : Handler for deleting an existing user
+func (c *UsersController) DeleteUser(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.UserService{}
+
+	err := s.DeleteUser(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, nil)
+}

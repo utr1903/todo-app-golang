@@ -74,3 +74,18 @@ func (c *TodoItemController) UpdateTodoItem(w http.ResponseWriter, r *http.Reque
 
 	c.Base.CreateResponse(w, http.StatusOK, nil)
 }
+
+// DeleteTodoItem : Handler for deleting an existing item
+func (c *TodoItemController) DeleteTodoItem(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.TodoItemService{}
+
+	err := s.DeleteTodoItem(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, nil)
+}

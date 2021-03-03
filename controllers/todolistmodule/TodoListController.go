@@ -74,3 +74,18 @@ func (c *TodoListController) UpdateTodoList(w http.ResponseWriter, r *http.Reque
 
 	c.Base.CreateResponse(w, http.StatusOK, nil)
 }
+
+// DeleteTodoList : Handler for deleting an existing list
+func (c *TodoListController) DeleteTodoList(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &services.TodoListService{}
+
+	err := s.DeleteTodoList(c.Base.Db, dto)
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, nil)
+}

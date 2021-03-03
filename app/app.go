@@ -51,6 +51,7 @@ func initUserController(a *App) {
 	a.Router.HandleFunc("/users/create", c.CreateUser).Methods("POST")
 	a.Router.HandleFunc("/user/get", c.GetUser).Methods("POST")
 	a.Router.HandleFunc("/user/update", c.UpdateUser).Methods("POST")
+	a.Router.HandleFunc("/user/delete", c.DeleteUser).Methods("POST")
 }
 
 func initTodoListController(a *App) {
@@ -61,6 +62,7 @@ func initTodoListController(a *App) {
 	a.Router.HandleFunc("/lists/create", c.CreateTodoList).Methods("POST")
 	a.Router.HandleFunc("/list/get", c.GetList).Methods("POST")
 	a.Router.HandleFunc("/list/update", c.UpdateTodoList).Methods("POST")
+	a.Router.HandleFunc("/list/delete", c.DeleteTodoList).Methods("POST")
 }
 
 func initTodoItemController(a *App) {
@@ -71,6 +73,7 @@ func initTodoItemController(a *App) {
 	a.Router.HandleFunc("/items/create", c.CreateTodoItem).Methods("POST")
 	a.Router.HandleFunc("/item/get", c.GetTodoItem).Methods("POST")
 	a.Router.HandleFunc("/item/update", c.UpdateTodoItem).Methods("POST")
+	a.Router.HandleFunc("/item/delete", c.DeleteTodoItem).Methods("POST")
 }
 
 // Serve : Runs web server
