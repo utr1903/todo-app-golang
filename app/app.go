@@ -44,6 +44,7 @@ func initUserController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &controllers.UsersController{Base: b}
 
+	a.Router.HandleFunc("/users/SignIn", c.SignIn).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/CreateUser", c.CreateUser).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/GetUsers", c.GetUsers).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/users/GetUser", c.GetUser).Methods("POST", "OPTIONS")

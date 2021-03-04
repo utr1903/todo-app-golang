@@ -1,15 +1,85 @@
 package controllers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/todo-app-golang/services/usersmodule"
 )
 
 // UsersController : Controller for User Model
 type UsersController struct {
 	Base *Controller
+}
+
+// Credentials : Username and password for signing in
+type Credentials struct {
+	UserName string `json:"userName"`
+	Password string `json:"password"`
+}
+
+// Claims : Claims for logged in user
+type Claims struct {
+	UserID   string `json:"userId"`
+	UserName string `json:"userName"`
+	jwt.StandardClaims
+}
+
+var jwtKey = []byte("some_dope_secret_key")
+
+// SignIn : Handler for signing in
+func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
+
+	// Get the JSON body and decode into credentials
+	var creds Credentials
+	err := json.NewDecoder(r.Body).Decode(&creds)
+	if err != nil {
+		// If the structure of the body is wrong, return an HTTP error
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Check given username and password
+	s := &usersmodule.UserService{}
+
+	if !s.CheckUserPassword(c.Base.Db, &creds.UserName) {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Declare the expiration time of the token
+	expirationTime := time.Now().Add(5 * time.Minute)
+
+	// Create the JWT claims, which includes the username and expiry time
+	claims := &Claims{
+		UserName: creds.UserName,
+		StandardClaims: jwt.StandardClaims{
+			// In JWT, the expiry time is expressed as unix milliseconds
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+
+	// Declare the token with the algorithm used for signing, and the claims
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+
+	if err != nil {
+		// If there is an error in creating the JWT return an internal server error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Finally, we set the client cookie for "token" as the JWT we just generated
+	cookie := &http.Cookie{
+		Name:    "token",
+		Value:   tokenString,
+		Expires: expirationTime,
+	}
+
+	w.Write([]byte(cookie.String()))
 }
 
 // GetUsers : Handler for getting all users

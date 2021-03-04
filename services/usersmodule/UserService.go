@@ -5,10 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
-	"net/http"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 
 	"github.com/todo-app-golang/services/usersmodule/dtos"
@@ -46,41 +44,6 @@ func (s *UserService) CreateUser(db *sql.DB, dto *string) (*string, error) {
 	}
 
 	return &userID, nil
-}
-
-// SignIn : Checking username and password -> Returning token
-func SignIn(userInfo *dtos.User) (*http.Cookie, error) {
-
-	// Declare the expiration time of the token
-	expirationTime := time.Now().Add(5 * time.Minute)
-
-	// Create the JWT claims
-	claims := &dtos.Claims{
-		UserID:   userInfo.ID,
-		UserName: userInfo.UserName,
-		StandardClaims: jwt.StandardClaims{
-			// In JWT, the expiry time is expressed as unix milliseconds
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-
-	// Declare the token with the algorithm used for signing, and the claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Create the JWT string
-	tokenString, err := token.SignedString(dtos.JwtKey)
-	if err != nil {
-		return nil, err
-	}
-
-	// Finally, we set the client cookie for "token" as the JWT we just generated
-	cookie := &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
-		Expires: expirationTime,
-	}
-
-	return cookie, nil
 }
 
 // GetUsers : Returns all users
@@ -188,6 +151,18 @@ func (s *UserService) DeleteUser(db *sql.DB, dto *string) error {
 	}
 
 	return nil
+}
+
+// CheckUserPassword : Checks whether given username and password match
+func (s *UserService) CheckUserPassword(db *sql.DB, userName *string) bool {
+	q := "select password from users where username = ?"
+	var password string
+	err := db.QueryRow(q, userName).Scan(&password)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 func (s *UserService) doesUserExist(db *sql.DB, userID *string) bool {
