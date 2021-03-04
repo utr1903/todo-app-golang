@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+
+	"github.com/todo-app-golang/commons"
 	"github.com/todo-app-golang/services/usersmodule"
 )
 
@@ -15,26 +17,11 @@ type UsersController struct {
 	Base *Controller
 }
 
-// Credentials : Username and password for signing in
-type Credentials struct {
-	UserName string `json:"userName"`
-	Password string `json:"password"`
-}
-
-// Claims : Claims for logged in user
-type Claims struct {
-	UserID   string `json:"userId"`
-	UserName string `json:"userName"`
-	jwt.StandardClaims
-}
-
-var jwtKey = []byte("some_dope_secret_key")
-
 // SignIn : Handler for signing in
 func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	// Get the JSON body and decode into credentials
-	var creds Credentials
+	var creds commons.Credentials
 	err := json.NewDecoder(r.Body).Decode(&creds)
 	if err != nil {
 		// If the structure of the body is wrong, return an HTTP error
@@ -54,7 +41,7 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	expirationTime := time.Now().Add(5 * time.Minute)
 
 	// Create the JWT claims, which includes the username and expiry time
-	claims := &Claims{
+	claims := &commons.Claims{
 		UserName: creds.UserName,
 		StandardClaims: jwt.StandardClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
@@ -64,7 +51,7 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString(commons.JwtKey)
 
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error

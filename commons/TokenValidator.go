@@ -12,6 +12,12 @@ import (
 // TokenValidator : Parser for tokens
 type TokenValidator struct{}
 
+// Credentials : Username and password for signing in
+type Credentials struct {
+	UserName string `json:"userName"`
+	Password string `json:"password"`
+}
+
 // Claims : Claims for logged in user
 type Claims struct {
 	UserID   string `json:"userId"`
@@ -19,7 +25,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-var jwtKey = []byte("some_dope_secret_key")
+var JwtKey = []byte("some_dope_secret_key")
 
 // ParseUserID : Parses UserId from token for further purposes
 func ParseUserID(r *http.Request) (*string, error) {
@@ -33,7 +39,7 @@ func ParseUserID(r *http.Request) (*string, error) {
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(bearerToken[1], claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return JwtKey, nil
 	})
 
 	if err != nil {
