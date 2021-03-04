@@ -1,16 +1,15 @@
-package usersmodule
+package controllers
 
 import (
 	"log"
 	"net/http"
 
-	"github.com/todo-app-golang/controllers"
 	"github.com/todo-app-golang/services"
 )
 
 // UsersController : Controller for User Model
 type UsersController struct {
-	Base *controllers.Controller
+	Base *Controller
 }
 
 // GetUsers : Handler for getting all users

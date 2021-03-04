@@ -1,16 +1,15 @@
-package todolistmodule
+package controllers
 
 import (
 	"log"
 	"net/http"
 
-	"github.com/todo-app-golang/controllers"
 	"github.com/todo-app-golang/services"
 )
 
 // TodoListController : Controller for Todo List Model
 type TodoListController struct {
-	Base *controllers.Controller
+	Base *Controller
 }
 
 // GetTodoLists : Handler for all todo lists

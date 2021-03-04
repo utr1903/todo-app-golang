@@ -10,9 +10,6 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/todo-app-golang/controllers"
-	"github.com/todo-app-golang/controllers/todoitemmodule"
-	"github.com/todo-app-golang/controllers/todolistmodule"
-	"github.com/todo-app-golang/controllers/usersmodule"
 )
 
 // App : DB and Controllers
@@ -45,7 +42,7 @@ func (a *App) InitControllers() {
 
 func initUserController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
-	c := &usersmodule.UsersController{Base: b}
+	c := &controllers.UsersController{Base: b}
 
 	a.Router.HandleFunc("/users/GetUsers", c.GetUsers).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/users/GetUser", c.GetUser).Methods("POST", "OPTIONS")
@@ -56,7 +53,7 @@ func initUserController(a *App) {
 
 func initTodoListController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
-	c := &todolistmodule.TodoListController{Base: b}
+	c := &controllers.TodoListController{Base: b}
 
 	a.Router.HandleFunc("/lists/GetLists", c.GetTodoLists).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/lists/GetList", c.GetTodoList).Methods("POST", "OPTIONS")
@@ -67,7 +64,7 @@ func initTodoListController(a *App) {
 
 func initTodoItemController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
-	c := &todoitemmodule.TodoItemController{Base: b}
+	c := &controllers.TodoItemController{Base: b}
 
 	a.Router.HandleFunc("/items/GetItems", c.GetTodoItems).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/items/GetItem", c.GetTodoItem).Methods("POST", "OPTIONS")
