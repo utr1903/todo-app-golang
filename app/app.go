@@ -47,10 +47,10 @@ func initUserController(a *App) {
 
 	a.Router.HandleFunc("/users/SignIn", c.SignIn).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/CreateUser", c.CreateUser).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/users/GetUsers", c.GetUsers).Methods("GET", "OPTIONS")
-	a.Router.HandleFunc("/users/GetUser", c.GetUser).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/users/UpdateUser", c.UpdateUser).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/users/DeleteUser", c.DeleteUser).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/users/GetUsers", commons.ValidateToken(c.GetUsers)).Methods("GET", "OPTIONS")
+	a.Router.HandleFunc("/users/GetUser", commons.ValidateToken(c.GetUser)).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/users/UpdateUser", commons.ValidateToken(c.UpdateUser)).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/users/DeleteUser", commons.ValidateToken(c.DeleteUser)).Methods("POST", "OPTIONS")
 }
 
 func initTodoListController(a *App) {
@@ -59,20 +59,20 @@ func initTodoListController(a *App) {
 
 	a.Router.HandleFunc("/lists/CreateList", c.CreateTodoList).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/GetLists", commons.ValidateToken(c.GetTodoLists)).Methods("GET", "OPTIONS")
-	a.Router.HandleFunc("/lists/GetList", c.GetTodoList).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/lists/UpdateList", c.UpdateTodoList).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/lists/DeleteList", c.DeleteTodoList).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/lists/GetList", commons.ValidateToken(c.GetTodoList)).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/lists/UpdateList", commons.ValidateToken(c.UpdateTodoList)).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/lists/DeleteList", commons.ValidateToken(c.DeleteTodoList)).Methods("POST", "OPTIONS")
 }
 
 func initTodoItemController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &controllers.TodoItemController{Base: b}
 
-	a.Router.HandleFunc("/items/CreateItem", c.CreateTodoItem).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/items/GetItems", c.GetTodoItems).Methods("GET", "OPTIONS")
-	a.Router.HandleFunc("/items/GetItem", c.GetTodoItem).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/items/UpdateItem", c.UpdateTodoItem).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/items/DeleteItem", c.DeleteTodoItem).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/items/CreateItem", commons.ValidateToken(c.CreateTodoItem)).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/items/GetItems", commons.ValidateToken(c.GetTodoItems)).Methods("GET", "OPTIONS")
+	a.Router.HandleFunc("/items/GetItem", commons.ValidateToken(c.GetTodoItem)).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/items/UpdateItem", commons.ValidateToken(c.UpdateTodoItem)).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/items/DeleteItem", commons.ValidateToken(c.DeleteTodoItem)).Methods("POST", "OPTIONS")
 }
 
 // RouterWithCORS : To prevent getting CORS errors from Angular UI

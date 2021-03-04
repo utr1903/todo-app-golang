@@ -20,14 +20,14 @@ type TodoListService struct {
 }
 
 // GetLists : Returns all lists
-func (s *TodoListService) GetLists(db *sql.DB) ([]dtos.TodoList, error) {
+func (s *TodoListService) GetLists(db *sql.DB) ([]dtos.GetTodoLists, error) {
 
 	userID, err := commons.ParseUserID(s.Req)
 	if err != nil {
 		return nil, err
 	}
 
-	q := "select * from lists where userid = ?"
+	q := "select Id, Name from lists where userid = ?"
 
 	rows, err := db.Query(q, userID)
 	if err != nil {
@@ -36,11 +36,11 @@ func (s *TodoListService) GetLists(db *sql.DB) ([]dtos.TodoList, error) {
 
 	defer rows.Close()
 
-	lists := []dtos.TodoList{}
+	lists := []dtos.GetTodoLists{}
 
 	for rows.Next() {
-		var list dtos.TodoList
-		if rows.Scan(&list.ID, &list.UserID, &list.Name) != nil {
+		var list dtos.GetTodoLists
+		if rows.Scan(&list.ListID, &list.ListName) != nil {
 			return nil, err
 		}
 		lists = append(lists, list)
