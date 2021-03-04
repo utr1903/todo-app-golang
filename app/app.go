@@ -44,9 +44,9 @@ func initUserController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &controllers.UsersController{Base: b}
 
+	a.Router.HandleFunc("/users/CreateUser", c.CreateUser).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/GetUsers", c.GetUsers).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/users/GetUser", c.GetUser).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/users/CreateUser", c.CreateUser).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/UpdateUser", c.UpdateUser).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/DeleteUser", c.DeleteUser).Methods("POST", "OPTIONS")
 }
@@ -55,9 +55,9 @@ func initTodoListController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &controllers.TodoListController{Base: b}
 
+	a.Router.HandleFunc("/lists/CreateList", c.CreateTodoList).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/GetLists", c.GetTodoLists).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/lists/GetList", c.GetTodoList).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/lists/CreateList", c.CreateTodoList).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/UpdateList", c.UpdateTodoList).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/DeleteList", c.DeleteTodoList).Methods("POST", "OPTIONS")
 }
@@ -66,9 +66,9 @@ func initTodoItemController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &controllers.TodoItemController{Base: b}
 
+	a.Router.HandleFunc("/items/CreateItem", c.CreateTodoItem).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/items/GetItems", c.GetTodoItems).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/items/GetItem", c.GetTodoItem).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/items/CreateItem", c.CreateTodoItem).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/items/UpdateItem", c.UpdateTodoItem).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/items/DeleteItem", c.DeleteTodoItem).Methods("POST", "OPTIONS")
 }
