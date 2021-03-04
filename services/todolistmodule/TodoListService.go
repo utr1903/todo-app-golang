@@ -5,18 +5,31 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/todo-app-golang/commons"
 	"github.com/todo-app-golang/services/todolistmodule/dtos"
 )
 
 // TodoListService : Implementation of TodoListService
-type TodoListService struct{}
+type TodoListService struct {
+	Req *http.Request
+}
 
 // GetLists : Returns all lists
 func (s *TodoListService) GetLists(db *sql.DB) ([]dtos.TodoList, error) {
-	rows, err := db.Query("select * from lists")
+
+	userID, err := commons.ParseUserID(s.Req)
+	if err != nil {
+		return nil, err
+	}
+
+	q := "select * from lists where userid = ?"
+
+	rows, err := db.Query(q, userID)
 	if err != nil {
 		return nil, err
 	}

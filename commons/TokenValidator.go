@@ -2,7 +2,6 @@ package commons
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -63,12 +62,17 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 			bearerToken := strings.Split(authorizationHeader, " ")
 			if len(bearerToken) == 2 {
 
-				token, err := jwt.Parse(bearerToken[1], func(token *jwt.Token) (interface{}, error) {
-					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-						return nil, fmt.Errorf("There was an error")
-					}
-					return []byte("secret"), nil
+				claims := &Claims{}
+				token, err := jwt.ParseWithClaims(bearerToken[1], claims, func(token *jwt.Token) (interface{}, error) {
+					return JwtKey, nil
 				})
+
+				// token, err := jwt.Parse(bearerToken[1], func(token *jwt.Token) (interface{}, error) {
+				// 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				// 		return nil, fmt.Errorf("There was an error")
+				// 	}
+				// 	return []byte("secret"), nil
+				// })
 
 				if err != nil {
 					// json.NewEncoder(w).Encode(Exception{Message: error.Error()})

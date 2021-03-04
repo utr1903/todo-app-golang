@@ -31,8 +31,8 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	// Check given username and password
 	s := &usersmodule.UserService{}
-
-	if !s.CheckUserPassword(c.Base.Db, &creds.UserName) {
+	userID, err := s.CheckUser(c.Base.Db, &creds.UserName, &creds.Password)
+	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -42,6 +42,7 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &commons.Claims{
+		UserID:   *userID,
 		UserName: creds.UserName,
 		StandardClaims: jwt.StandardClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
@@ -60,13 +61,15 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Finally, we set the client cookie for "token" as the JWT we just generated
-	cookie := &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
-		Expires: expirationTime,
-	}
+	// cookie := &http.Cookie{
+	// 	Name:    "token",
+	// 	Value:   tokenString,
+	// 	Expires: expirationTime,
+	// }
 
-	w.Write([]byte(cookie.String()))
+	// w.Write([]byte(cookie.String()))
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(tokenString))
 }
 
 // GetUsers : Handler for getting all users

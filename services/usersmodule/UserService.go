@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	"time"
 
@@ -153,16 +154,19 @@ func (s *UserService) DeleteUser(db *sql.DB, dto *string) error {
 	return nil
 }
 
-// CheckUserPassword : Checks whether given username and password match
-func (s *UserService) CheckUserPassword(db *sql.DB, userName *string) bool {
-	q := "select password from users where username = ?"
-	var password string
-	err := db.QueryRow(q, userName).Scan(&password)
+// CheckUser : Checks whether given username and password match
+func (s *UserService) CheckUser(db *sql.DB, userName *string, password *string) (*string, error) {
+	q := "select id from users" +
+		" where username = ?" +
+		" and password = ?"
+
+	var userID string
+	err := db.QueryRow(q, userName, password).Scan(&userID)
 	if err != nil {
-		return false
+		return nil, errors.New("user_not_found")
 	}
 
-	return true
+	return &userID, nil
 }
 
 func (s *UserService) doesUserExist(db *sql.DB, userID *string) bool {

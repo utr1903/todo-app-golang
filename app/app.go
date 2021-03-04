@@ -9,6 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 
+	"github.com/todo-app-golang/commons"
 	"github.com/todo-app-golang/controllers"
 )
 
@@ -57,7 +58,7 @@ func initTodoListController(a *App) {
 	c := &controllers.TodoListController{Base: b}
 
 	a.Router.HandleFunc("/lists/CreateList", c.CreateTodoList).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/lists/GetLists", c.GetTodoLists).Methods("GET", "OPTIONS")
+	a.Router.HandleFunc("/lists/GetLists", commons.ValidateToken(c.GetTodoLists)).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/lists/GetList", c.GetTodoList).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/UpdateList", c.UpdateTodoList).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/DeleteList", c.DeleteTodoList).Methods("POST", "OPTIONS")
