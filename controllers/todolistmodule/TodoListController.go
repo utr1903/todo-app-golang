@@ -13,8 +13,8 @@ type TodoListController struct {
 	Base *controllers.Controller
 }
 
-// GetLists : Handler for all todo lists
-func (c *TodoListController) GetLists(w http.ResponseWriter, r *http.Request) {
+// GetTodoLists : Handler for all todo lists
+func (c *TodoListController) GetTodoLists(w http.ResponseWriter, r *http.Request) {
 	s := &services.TodoListService{}
 	users, err := s.GetLists(c.Base.Db)
 
@@ -25,8 +25,8 @@ func (c *TodoListController) GetLists(w http.ResponseWriter, r *http.Request) {
 	c.Base.CreateResponse(w, http.StatusOK, users)
 }
 
-// GetList : Handler for getting a list with given ID
-func (c *TodoListController) GetList(w http.ResponseWriter, r *http.Request) {
+// GetTodoList : Handler for getting a list with given ID
+func (c *TodoListController) GetTodoList(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToMap(w, r)
 	listID, ok := dto["listId"].(string)

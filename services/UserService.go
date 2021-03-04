@@ -14,7 +14,7 @@ import (
 type User struct {
 	ID       string `json:"id"`
 	UserName string `json:"userName"`
-	Password string `json:"passWord"`
+	Password string `json:"password"`
 }
 
 // UserService : Implementation of UserService
