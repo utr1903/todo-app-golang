@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/todo-app-golang/services"
+	"github.com/todo-app-golang/services/usersmodule"
 )
 
 // UsersController : Controller for User Model
@@ -16,7 +16,7 @@ type UsersController struct {
 func (c *UsersController) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	// c.Base.ParseRequest(w, r)
-	s := &services.UserService{}
+	s := &usersmodule.UserService{}
 
 	users, err := s.GetUsers(c.Base.Db)
 	if err != nil {
@@ -36,7 +36,7 @@ func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("UserId is not valid")
 	}
 
-	s := &services.UserService{}
+	s := &usersmodule.UserService{}
 
 	user, err := s.GetUser(c.Base.Db, userID)
 	if err != nil {
@@ -51,7 +51,7 @@ func (c *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.UserService{}
+	s := &usersmodule.UserService{}
 
 	userID, err := s.CreateUser(c.Base.Db, dto)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *UsersController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.UserService{}
+	s := &usersmodule.UserService{}
 
 	err := s.UpdateUser(c.Base.Db, dto)
 	if err != nil {
@@ -81,7 +81,7 @@ func (c *UsersController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.UserService{}
+	s := &usersmodule.UserService{}
 
 	err := s.DeleteUser(c.Base.Db, dto)
 	if err != nil {

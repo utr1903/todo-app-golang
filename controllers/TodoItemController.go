@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/todo-app-golang/services"
+	"github.com/todo-app-golang/services/todoitemmodule"
 )
 
 // TodoItemController : Controller for Todo Item Model
@@ -14,7 +14,7 @@ type TodoItemController struct {
 
 // GetTodoItems : Handler for getting all todo items
 func (c *TodoItemController) GetTodoItems(w http.ResponseWriter, r *http.Request) {
-	s := &services.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{}
 	users, err := s.GetItems(c.Base.Db)
 
 	if err != nil {
@@ -34,7 +34,7 @@ func (c *TodoItemController) GetTodoItem(w http.ResponseWriter, r *http.Request)
 		log.Fatal("ItemID is not valid")
 	}
 
-	s := &services.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{}
 
 	item, err := s.GetItem(c.Base.Db, itemID)
 	if err != nil {
@@ -49,7 +49,7 @@ func (c *TodoItemController) CreateTodoItem(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{}
 
 	itemID, err := s.CreateTodoItem(c.Base.Db, dto)
 	if err != nil {
@@ -64,7 +64,7 @@ func (c *TodoItemController) UpdateTodoItem(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{}
 
 	err := s.UpdateTodoItem(c.Base.Db, dto)
 	if err != nil {
@@ -79,7 +79,7 @@ func (c *TodoItemController) DeleteTodoItem(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{}
 
 	err := s.DeleteTodoItem(c.Base.Db, dto)
 	if err != nil {

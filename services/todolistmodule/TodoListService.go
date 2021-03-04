@@ -1,4 +1,4 @@
-package services
+package todolistmodule
 
 import (
 	"context"
@@ -8,20 +8,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/todo-app-golang/services/todolistmodule/dtos"
 )
-
-// TodoList : TodoList model
-type TodoList struct {
-	ID     string `json:"id"`
-	UserID string `json:"userId"`
-	Name   string `json:"name"`
-}
 
 // TodoListService : Implementation of TodoListService
 type TodoListService struct{}
 
 // GetLists : Returns all lists
-func (s *TodoListService) GetLists(db *sql.DB) ([]TodoList, error) {
+func (s *TodoListService) GetLists(db *sql.DB) ([]dtos.TodoList, error) {
 	rows, err := db.Query("select * from lists")
 	if err != nil {
 		return nil, err
@@ -29,10 +23,10 @@ func (s *TodoListService) GetLists(db *sql.DB) ([]TodoList, error) {
 
 	defer rows.Close()
 
-	lists := []TodoList{}
+	lists := []dtos.TodoList{}
 
 	for rows.Next() {
-		var list TodoList
+		var list dtos.TodoList
 		if rows.Scan(&list.ID, &list.UserID, &list.Name) != nil {
 			return nil, err
 		}
@@ -43,8 +37,8 @@ func (s *TodoListService) GetLists(db *sql.DB) ([]TodoList, error) {
 }
 
 // GetList : Returns list with given ID
-func (s *TodoListService) GetList(db *sql.DB, itemID string) (*TodoList, error) {
-	list := &TodoList{}
+func (s *TodoListService) GetList(db *sql.DB, itemID string) (*dtos.TodoList, error) {
+	list := &dtos.TodoList{}
 
 	q := "select * from lists where id = ?"
 	err := db.QueryRow(q, itemID).
@@ -60,7 +54,7 @@ func (s *TodoListService) GetList(db *sql.DB, itemID string) (*TodoList, error) 
 // CreateTodoList : Creates a new todo list
 func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, error) {
 
-	todoList := &TodoList{}
+	todoList := &dtos.TodoList{}
 	json.Unmarshal([]byte(*dto), &todoList)
 
 	// Check whether to be created list is assigning to an existing user
@@ -96,7 +90,7 @@ func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, erro
 // UpdateTodoList : Updates an existing todo list
 func (s *TodoListService) UpdateTodoList(db *sql.DB, dto *string) error {
 
-	todoList := &TodoList{}
+	todoList := &dtos.TodoList{}
 	json.Unmarshal([]byte(*dto), &todoList)
 
 	// Check whether to be created list is assigning to an existing user

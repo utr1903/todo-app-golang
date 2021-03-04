@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/todo-app-golang/services"
+	"github.com/todo-app-golang/services/todolistmodule"
 )
 
 // TodoListController : Controller for Todo List Model
@@ -14,7 +14,7 @@ type TodoListController struct {
 
 // GetTodoLists : Handler for all todo lists
 func (c *TodoListController) GetTodoLists(w http.ResponseWriter, r *http.Request) {
-	s := &services.TodoListService{}
+	s := &todolistmodule.TodoListService{}
 	users, err := s.GetLists(c.Base.Db)
 
 	if err != nil {
@@ -34,7 +34,7 @@ func (c *TodoListController) GetTodoList(w http.ResponseWriter, r *http.Request)
 		log.Fatal("ListID is not valid")
 	}
 
-	s := &services.TodoListService{}
+	s := &todolistmodule.TodoListService{}
 
 	list, err := s.GetList(c.Base.Db, listID)
 	if err != nil {
@@ -49,7 +49,7 @@ func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.TodoListService{}
+	s := &todolistmodule.TodoListService{}
 
 	listID, err := s.CreateTodoList(c.Base.Db, dto)
 	if err != nil {
@@ -64,7 +64,7 @@ func (c *TodoListController) UpdateTodoList(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.TodoListService{}
+	s := &todolistmodule.TodoListService{}
 
 	err := s.UpdateTodoList(c.Base.Db, dto)
 	if err != nil {
@@ -79,7 +79,7 @@ func (c *TodoListController) DeleteTodoList(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &services.TodoListService{}
+	s := &todolistmodule.TodoListService{}
 
 	err := s.DeleteTodoList(c.Base.Db, dto)
 	if err != nil {

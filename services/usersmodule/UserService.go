@@ -1,4 +1,4 @@
-package services
+package usersmodule
 
 import (
 	"context"
@@ -8,20 +8,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/todo-app-golang/services/usersmodule/dtos"
 )
-
-// User : User model
-type User struct {
-	ID       string `json:"id"`
-	UserName string `json:"userName"`
-	Password string `json:"password"`
-}
 
 // UserService : Implementation of UserService
 type UserService struct{}
 
 // GetUsers : Returns all users
-func (s *UserService) GetUsers(db *sql.DB) ([]User, error) {
+func (s *UserService) GetUsers(db *sql.DB) ([]dtos.User, error) {
 	rows, err := db.Query("select * from users")
 	if err != nil {
 		return nil, err
@@ -29,10 +23,10 @@ func (s *UserService) GetUsers(db *sql.DB) ([]User, error) {
 
 	defer rows.Close()
 
-	users := []User{}
+	users := []dtos.User{}
 
 	for rows.Next() {
-		var user User
+		var user dtos.User
 		if rows.Scan(&user.ID, &user.UserName, &user.Password) != nil {
 			return nil, err
 		}
@@ -43,8 +37,8 @@ func (s *UserService) GetUsers(db *sql.DB) ([]User, error) {
 }
 
 // GetUser : Returns user with given ID
-func (s *UserService) GetUser(db *sql.DB, userID string) (*User, error) {
-	user := &User{}
+func (s *UserService) GetUser(db *sql.DB, userID string) (*dtos.User, error) {
+	user := &dtos.User{}
 
 	q := "select * from users where id = ?"
 	err := db.QueryRow(q, userID).
@@ -71,7 +65,7 @@ func (s *UserService) CreateUser(db *sql.DB, dto *string) (*string, error) {
 	}
 	defer stmt.Close()
 
-	user := &User{}
+	user := &dtos.User{}
 	json.Unmarshal([]byte(*dto), &user)
 
 	userID := uuid.New().String()
@@ -91,7 +85,7 @@ func (s *UserService) CreateUser(db *sql.DB, dto *string) (*string, error) {
 // UpdateUser : Updates an existing user
 func (s *UserService) UpdateUser(db *sql.DB, dto *string) error {
 
-	user := &User{}
+	user := &dtos.User{}
 	json.Unmarshal([]byte(*dto), &user)
 
 	// Check whether to be created list is assigning to an existing user
