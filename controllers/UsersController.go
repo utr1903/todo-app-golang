@@ -20,6 +20,8 @@ type UsersController struct {
 // SignIn : Handler for signing in
 func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Content-Type", "application/json")
+
 	// Get the JSON body and decode into credentials
 	var creds commons.Credentials
 	err := json.NewDecoder(r.Body).Decode(&creds)
@@ -60,16 +62,15 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Finally, we set the client cookie for "token" as the JWT we just generated
-	// cookie := &http.Cookie{
-	// 	Name:    "token",
-	// 	Value:   tokenString,
-	// 	Expires: expirationTime,
-	// }
+	// Set the client token
+	t := &commons.Token{
+		Token:      tokenString,
+		ExpireDate: expirationTime,
+	}
 
-	// w.Write([]byte(cookie.String()))
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(tokenString))
+	// w.Write([]byte(tokenString))
+	json.NewEncoder(w).Encode(t)
 }
 
 // GetUsers : Handler for getting all users

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -24,6 +25,13 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// Token : Token for logged in user
+type Token struct {
+	Token      string    `json:"token"`
+	ExpireDate time.Time `json:"expireDate"`
+}
+
+// JwtKey : Key for token generation
 var JwtKey = []byte("some_dope_secret_key")
 
 // ParseUserID : Parses UserId from token for further purposes
@@ -56,6 +64,8 @@ func ParseUserID(r *http.Request) (*string, error) {
 func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
+		w.Header().Set("Content-Type", "application/json")
+
 		authorizationHeader := r.Header.Get("authorization")
 		if authorizationHeader != "" {
 
@@ -67,15 +77,9 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 					return JwtKey, nil
 				})
 
-				// token, err := jwt.Parse(bearerToken[1], func(token *jwt.Token) (interface{}, error) {
-				// 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				// 		return nil, fmt.Errorf("There was an error")
-				// 	}
-				// 	return []byte("secret"), nil
-				// })
-
 				if err != nil {
 					// json.NewEncoder(w).Encode(Exception{Message: error.Error()})
+					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
 
@@ -83,11 +87,13 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 					// context.Set(req, "decoded", token.Claims)
 					next(w, r)
 				} else {
+					w.WriteHeader(http.StatusUnauthorized)
 					// json.NewEncoder(w).Encode(Exception{Message: "Invalid authorization token"})
 				}
 			}
 		} else {
 			// json.NewEncoder(w).Encode(Exception{Message: "An authorization header is required"})
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 	})
