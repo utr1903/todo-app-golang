@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -28,6 +27,7 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If the structure of the body is wrong, return an HTTP error
 		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(&commons.Exception{M: commons.RequestNotValid})
 		return
 	}
 
@@ -35,7 +35,8 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	s := &usersmodule.UserService{}
 	userID, err := s.CheckUser(c.Base.Db, &creds.UserName, &creds.Password)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(&commons.Exception{M: commons.UserNotFound})
 		return
 	}
 
@@ -58,19 +59,19 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(&commons.Exception{M: commons.TokenNotValid})
 		return
 	}
 
 	// Set the client token
-	t := &commons.Token{
+	result := &commons.Token{
 		Token:      tokenString,
 		ExpireDate: expirationTime,
 	}
 
 	w.WriteHeader(http.StatusOK)
-	// w.Write([]byte(tokenString))
-	json.NewEncoder(w).Encode(t)
+	json.NewEncoder(w).Encode(result)
 }
 
 // GetUsers : Handler for getting all users
@@ -93,8 +94,10 @@ func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 	dto := c.Base.ParseRequestToMap(w, r)
 	userID, ok := dto["userId"].(string)
 
+	w.Header().Set("Content-Type", "application/json")
 	if !ok {
-		log.Fatal("UserId is not valid")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(&commons.Exception{M: commons.UserIDNotValid})
 	}
 
 	s := &usersmodule.UserService{}
