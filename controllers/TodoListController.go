@@ -12,6 +12,24 @@ type TodoListController struct {
 	Base *Controller
 }
 
+// CreateTodoList : Handler for creating a new list
+func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Request) {
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &todolistmodule.TodoListService{
+		Req: r,
+	}
+
+	listID, err := s.CreateTodoList(c.Base.Db, dto)
+
+	if err != nil {
+		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(w, http.StatusOK, listID)
+}
+
 // GetTodoLists : Handler for all todo lists
 func (c *TodoListController) GetTodoLists(w http.ResponseWriter, r *http.Request) {
 
@@ -19,13 +37,13 @@ func (c *TodoListController) GetTodoLists(w http.ResponseWriter, r *http.Request
 		Req: r,
 	}
 
-	users, err := s.GetLists(c.Base.Db)
+	lists, err := s.GetTodoLists(c.Base.Db)
 
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, users)
+	c.Base.CreateResponse(w, http.StatusOK, lists)
 }
 
 // GetTodoList : Handler for getting a list with given ID
@@ -48,23 +66,6 @@ func (c *TodoListController) GetTodoList(w http.ResponseWriter, r *http.Request)
 	}
 
 	c.Base.CreateResponse(w, http.StatusOK, list)
-}
-
-// CreateTodoList : Handler for creating a new list
-func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Request) {
-
-	dto := c.Base.ParseRequestToString(w, r)
-
-	s := &todolistmodule.TodoListService{
-		Req: r,
-	}
-
-	listID, err := s.CreateTodoList(c.Base.Db, dto)
-	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
-	}
-
-	c.Base.CreateResponse(w, http.StatusOK, listID)
 }
 
 // UpdateTodoList : Handler for updating an existing list

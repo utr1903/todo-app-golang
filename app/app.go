@@ -57,7 +57,7 @@ func initTodoListController(a *App) {
 	b := &controllers.Controller{Db: a.Db}
 	c := &controllers.TodoListController{Base: b}
 
-	a.Router.HandleFunc("/lists/CreateList", c.CreateTodoList).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/lists/CreateList", commons.ValidateToken(c.CreateTodoList)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/GetLists", commons.ValidateToken(c.GetTodoLists)).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/lists/GetList", commons.ValidateToken(c.GetTodoList)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/UpdateList", commons.ValidateToken(c.UpdateTodoList)).Methods("POST", "OPTIONS")

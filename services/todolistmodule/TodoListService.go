@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-
 	"github.com/todo-app-golang/commons"
 	"github.com/todo-app-golang/services/todolistmodule/dtos"
 )
@@ -19,12 +18,60 @@ type TodoListService struct {
 	Req *http.Request
 }
 
-// GetLists : Returns all lists
-func (s *TodoListService) GetLists(db *sql.DB) ([]dtos.GetTodoLists, error) {
+// CreateTodoList : Creates a new todo list
+func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, error) {
 
 	userID, err := commons.ParseUserID(s.Req)
 	if err != nil {
 		return nil, err
+	}
+
+	// Check whether to be created list is assigning to an existing user
+	if !s.doesUserExist(db, userID) {
+		return nil, nil
+	}
+
+	todoList := &dtos.TodoList{
+		UserID: *userID,
+		Name:   *dto,
+	}
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+
+	q := "insert into lists (id, userid, name) values (?, ?, ?)"
+	stmt, err := db.PrepareContext(ctx, q)
+	if err != nil {
+		log.Printf("Error %s when preparing SQL statement", err)
+		return nil, err
+	}
+	defer stmt.Close()
+
+	listID := uuid.New().String()
+	res, err := stmt.ExecContext(ctx, listID, todoList.UserID, todoList.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	numRows, err := res.RowsAffected()
+	if numRows != 1 || err != nil {
+		return nil, err
+	}
+
+	return &listID, nil
+}
+
+// GetTodoLists : Returns all lists
+func (s *TodoListService) GetTodoLists(db *sql.DB) ([]dtos.GetTodoLists, error) {
+
+	userID, err := commons.ParseUserID(s.Req)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check whether to be created list is assigning to an existing user
+	if !s.doesUserExist(db, userID) {
+		return nil, nil
 	}
 
 	q := "select Id, Name from lists where userid = ?"
@@ -62,42 +109,6 @@ func (s *TodoListService) GetList(db *sql.DB, itemID string) (*dtos.TodoList, er
 	}
 
 	return list, nil
-}
-
-// CreateTodoList : Creates a new todo list
-func (s *TodoListService) CreateTodoList(db *sql.DB, dto *string) (*string, error) {
-
-	todoList := &dtos.TodoList{}
-	json.Unmarshal([]byte(*dto), &todoList)
-
-	// Check whether to be created list is assigning to an existing user
-	if !s.doesUserExist(db, &todoList.UserID) {
-		return nil, nil
-	}
-
-	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancelfunc()
-
-	q := "insert into lists (id, userid, name) values (?, ?, ?)"
-	stmt, err := db.PrepareContext(ctx, q)
-	if err != nil {
-		log.Printf("Error %s when preparing SQL statement", err)
-		return nil, err
-	}
-	defer stmt.Close()
-
-	listID := uuid.New().String()
-	res, err := stmt.ExecContext(ctx, listID, todoList.UserID, todoList.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	numRows, err := res.RowsAffected()
-	if numRows != 1 || err != nil {
-		return nil, err
-	}
-
-	return &listID, nil
 }
 
 // UpdateTodoList : Updates an existing todo list
