@@ -19,7 +19,7 @@ type TodoItemService struct {
 }
 
 // GetTodoItems : Returns all items
-func (s *TodoItemService) GetTodoItems(db *sql.DB, listID *string) ([]dtos.TodoItem, error) {
+func (s *TodoItemService) GetTodoItems(db *sql.DB, listID *string) ([]dtos.GetTodoItems, error) {
 
 	userID, err := commons.ParseUserID(s.Req)
 	if err != nil {
@@ -40,11 +40,11 @@ func (s *TodoItemService) GetTodoItems(db *sql.DB, listID *string) ([]dtos.TodoI
 
 	defer rows.Close()
 
-	items := []dtos.TodoItem{}
+	items := []dtos.GetTodoItems{}
 
 	for rows.Next() {
-		var item dtos.TodoItem
-		if rows.Scan(&item.ID, &item.Content) != nil {
+		var item dtos.GetTodoItems
+		if rows.Scan(&item.ItemID, &item.Content) != nil {
 			return nil, err
 		}
 		items = append(items, item)
