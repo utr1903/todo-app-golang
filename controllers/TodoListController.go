@@ -17,10 +17,7 @@ func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &todolistmodule.TodoListService{
-		Req: r,
-	}
-
+	s := &todolistmodule.TodoListService{Req: r}
 	listID, err := s.CreateTodoList(c.Base.Db, dto)
 
 	if err != nil {
@@ -33,10 +30,7 @@ func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Reque
 // GetTodoLists : Handler for all todo lists
 func (c *TodoListController) GetTodoLists(w http.ResponseWriter, r *http.Request) {
 
-	s := &todolistmodule.TodoListService{
-		Req: r,
-	}
-
+	s := &todolistmodule.TodoListService{Req: r}
 	lists, err := s.GetTodoLists(c.Base.Db)
 
 	if err != nil {
@@ -56,11 +50,8 @@ func (c *TodoListController) GetTodoList(w http.ResponseWriter, r *http.Request)
 		log.Fatal("ListID is not valid")
 	}
 
-	s := &todolistmodule.TodoListService{
-		Req: r,
-	}
-
-	list, err := s.GetList(c.Base.Db, listID)
+	s := &todolistmodule.TodoListService{Req: r}
+	list, err := s.GetTodoList(c.Base.Db, listID)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}
@@ -73,10 +64,7 @@ func (c *TodoListController) UpdateTodoList(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &todolistmodule.TodoListService{
-		Req: r,
-	}
-
+	s := &todolistmodule.TodoListService{Req: r}
 	err := s.UpdateTodoList(c.Base.Db, dto)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
@@ -90,10 +78,7 @@ func (c *TodoListController) DeleteTodoList(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &todolistmodule.TodoListService{
-		Req: r,
-	}
-
+	s := &todolistmodule.TodoListService{Req: r}
 	err := s.DeleteTodoList(c.Base.Db, dto)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)

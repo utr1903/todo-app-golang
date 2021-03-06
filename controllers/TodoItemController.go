@@ -14,14 +14,17 @@ type TodoItemController struct {
 
 // GetTodoItems : Handler for getting all todo items
 func (c *TodoItemController) GetTodoItems(w http.ResponseWriter, r *http.Request) {
-	s := &todoitemmodule.TodoItemService{}
-	users, err := s.GetItems(c.Base.Db)
+
+	dto := c.Base.ParseRequestToString(w, r)
+
+	s := &todoitemmodule.TodoItemService{Req: r}
+	items, err := s.GetTodoItems(c.Base.Db, dto)
 
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, users)
+	c.Base.CreateResponse(w, http.StatusOK, items)
 }
 
 // GetTodoItem : Handler for getting an item with given ID
@@ -34,7 +37,7 @@ func (c *TodoItemController) GetTodoItem(w http.ResponseWriter, r *http.Request)
 		log.Fatal("ItemID is not valid")
 	}
 
-	s := &todoitemmodule.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{Req: r}
 
 	item, err := s.GetItem(c.Base.Db, itemID)
 	if err != nil {
@@ -49,7 +52,7 @@ func (c *TodoItemController) CreateTodoItem(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &todoitemmodule.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{Req: r}
 
 	itemID, err := s.CreateTodoItem(c.Base.Db, dto)
 	if err != nil {
@@ -64,7 +67,7 @@ func (c *TodoItemController) UpdateTodoItem(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &todoitemmodule.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{Req: r}
 
 	err := s.UpdateTodoItem(c.Base.Db, dto)
 	if err != nil {
@@ -79,7 +82,7 @@ func (c *TodoItemController) DeleteTodoItem(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &todoitemmodule.TodoItemService{}
+	s := &todoitemmodule.TodoItemService{Req: r}
 
 	err := s.DeleteTodoItem(c.Base.Db, dto)
 	if err != nil {

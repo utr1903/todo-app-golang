@@ -96,12 +96,12 @@ func (s *TodoListService) GetTodoLists(db *sql.DB) ([]dtos.GetTodoLists, error) 
 	return lists, nil
 }
 
-// GetList : Returns list with given ID
-func (s *TodoListService) GetList(db *sql.DB, itemID string) (*dtos.TodoList, error) {
+// GetTodoList : Returns list with given ID and it's items
+func (s *TodoListService) GetTodoList(db *sql.DB, listID string) (*dtos.TodoList, error) {
 	list := &dtos.TodoList{}
 
-	q := "select * from lists where Id = ?"
-	err := db.QueryRow(q, itemID).
+	q := "select * from items where ListId = ?"
+	err := db.QueryRow(q, listID).
 		Scan(&list.ID, &list.UserID, &list.Name)
 
 	if err != nil {
