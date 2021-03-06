@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
+	"github.com/todo-app-golang/commons"
 	"github.com/todo-app-golang/services/todolistmodule"
 )
 
@@ -17,8 +17,14 @@ func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Reque
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &todolistmodule.TodoListService{Req: r}
-	listID, err := s.CreateTodoList(c.Base.Db, dto)
+	s := &todolistmodule.TodoListService{
+		Req: r,
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
+	}
+	listID, err := s.CreateTodoList(dto)
 
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
@@ -30,8 +36,15 @@ func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Reque
 // GetTodoLists : Handler for all todo lists
 func (c *TodoListController) GetTodoLists(w http.ResponseWriter, r *http.Request) {
 
-	s := &todolistmodule.TodoListService{Req: r}
-	lists, err := s.GetTodoLists(c.Base.Db)
+	s := &todolistmodule.TodoListService{
+		Req: r,
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
+	}
+
+	lists, err := s.GetTodoLists()
 
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
@@ -40,32 +53,13 @@ func (c *TodoListController) GetTodoLists(w http.ResponseWriter, r *http.Request
 	c.Base.CreateResponse(w, http.StatusOK, lists)
 }
 
-// GetTodoList : Handler for getting a list with given ID
-func (c *TodoListController) GetTodoList(w http.ResponseWriter, r *http.Request) {
-
-	dto := c.Base.ParseRequestToMap(w, r)
-	listID, ok := dto["listId"].(string)
-
-	if !ok {
-		log.Fatal("ListID is not valid")
-	}
-
-	s := &todolistmodule.TodoListService{Req: r}
-	list, err := s.GetTodoList(c.Base.Db, listID)
-	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
-	}
-
-	c.Base.CreateResponse(w, http.StatusOK, list)
-}
-
 // UpdateTodoList : Handler for updating an existing list
 func (c *TodoListController) UpdateTodoList(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
 
 	s := &todolistmodule.TodoListService{Req: r}
-	err := s.UpdateTodoList(c.Base.Db, dto)
+	err := s.UpdateTodoList(dto)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}
@@ -79,7 +73,7 @@ func (c *TodoListController) DeleteTodoList(w http.ResponseWriter, r *http.Reque
 	dto := c.Base.ParseRequestToString(w, r)
 
 	s := &todolistmodule.TodoListService{Req: r}
-	err := s.DeleteTodoList(c.Base.Db, dto)
+	err := s.DeleteTodoList(dto)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}

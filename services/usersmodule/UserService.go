@@ -10,20 +10,24 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/todo-app-golang/commons"
 	"github.com/todo-app-golang/services/usersmodule/dtos"
 )
 
 // UserService : Implementation of UserService
-type UserService struct{}
+type UserService struct {
+	Db *sql.DB
+	Cu *commons.CommonUtils
+}
 
 // CreateUser : Creates a new user -> It is actually like signing up
-func (s *UserService) CreateUser(db *sql.DB, dto *string) (*string, error) {
+func (s *UserService) CreateUser(dto *string) (*string, error) {
 
 	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelfunc()
 
 	q := "insert into users (id, username, password) values (?, ?, ?)"
-	stmt, err := db.PrepareContext(ctx, q)
+	stmt, err := s.Db.PrepareContext(ctx, q)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return nil, err
@@ -47,34 +51,12 @@ func (s *UserService) CreateUser(db *sql.DB, dto *string) (*string, error) {
 	return &userID, nil
 }
 
-// GetUsers : Returns all users
-func (s *UserService) GetUsers(db *sql.DB) ([]dtos.User, error) {
-	rows, err := db.Query("select * from users")
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	users := []dtos.User{}
-
-	for rows.Next() {
-		var user dtos.User
-		if rows.Scan(&user.ID, &user.UserName, &user.Password) != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-
-	return users, nil
-}
-
 // GetUser : Returns user with given ID
-func (s *UserService) GetUser(db *sql.DB, userID string) (*dtos.User, error) {
+func (s *UserService) GetUser(userID string) (*dtos.User, error) {
 	user := &dtos.User{}
 
 	q := "select * from users where id = ?"
-	err := db.QueryRow(q, userID).
+	err := s.Db.QueryRow(q, userID).
 		Scan(&user.ID, &user.UserName, &user.Password)
 
 	if err != nil {
@@ -85,13 +67,13 @@ func (s *UserService) GetUser(db *sql.DB, userID string) (*dtos.User, error) {
 }
 
 // UpdateUser : Updates an existing user
-func (s *UserService) UpdateUser(db *sql.DB, dto *string) error {
+func (s *UserService) UpdateUser(dto *string) error {
 
 	user := &dtos.User{}
 	json.Unmarshal([]byte(*dto), &user)
 
 	// Check whether to be updated user exists
-	if !s.doesUserExist(db, &user.ID) {
+	if !s.Cu.DoesUserExist(s.Db, &user.ID) {
 		return nil
 	}
 
@@ -99,7 +81,7 @@ func (s *UserService) UpdateUser(db *sql.DB, dto *string) error {
 	defer cancelfunc()
 
 	q := "update users set username = ?, password = ? where id = ?"
-	stmt, err := db.PrepareContext(ctx, q)
+	stmt, err := s.Db.PrepareContext(ctx, q)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
@@ -120,13 +102,10 @@ func (s *UserService) UpdateUser(db *sql.DB, dto *string) error {
 }
 
 // DeleteUser : Deletes an existing user
-func (s *UserService) DeleteUser(db *sql.DB, dto *string) error {
-
-	var userID string
-	json.Unmarshal([]byte(*dto), &userID)
+func (s *UserService) DeleteUser(userID *string) error {
 
 	// Check whether to be deleted user exists
-	if !s.doesUserExist(db, &userID) {
+	if !s.Cu.DoesUserExist(s.Db, userID) {
 		return nil
 	}
 
@@ -134,7 +113,7 @@ func (s *UserService) DeleteUser(db *sql.DB, dto *string) error {
 	defer cancelfunc()
 
 	q := "delete from users where id = ?"
-	stmt, err := db.PrepareContext(ctx, q)
+	stmt, err := s.Db.PrepareContext(ctx, q)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
@@ -155,27 +134,16 @@ func (s *UserService) DeleteUser(db *sql.DB, dto *string) error {
 }
 
 // CheckUser : Checks whether given username and password match
-func (s *UserService) CheckUser(db *sql.DB, userName *string, password *string) (*string, error) {
+func (s *UserService) CheckUser(userName *string, password *string) (*string, error) {
 	q := "select id from users" +
 		" where username = ?" +
 		" and password = ?"
 
 	var userID string
-	err := db.QueryRow(q, userName, password).Scan(&userID)
+	err := s.Db.QueryRow(q, userName, password).Scan(&userID)
 	if err != nil {
 		return nil, errors.New("user_not_found")
 	}
 
 	return &userID, nil
-}
-
-func (s *UserService) doesUserExist(db *sql.DB, userID *string) bool {
-	q := "select id from users where id = ?"
-	var userExists string
-	err := db.QueryRow(q, userID).Scan(&userExists)
-	if err != nil {
-		return false
-	}
-
-	return true
 }

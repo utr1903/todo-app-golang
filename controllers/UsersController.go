@@ -32,8 +32,14 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check given username and password
-	s := &usersmodule.UserService{}
-	userID, err := s.CheckUser(c.Base.Db, &creds.UserName, &creds.Password)
+	s := &usersmodule.UserService{
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
+	}
+
+	userID, err := s.CheckUser(&creds.UserName, &creds.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(&commons.Exception{M: commons.UserNotFound})
@@ -74,20 +80,6 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-// GetUsers : Handler for getting all users
-func (c *UsersController) GetUsers(w http.ResponseWriter, r *http.Request) {
-
-	// c.Base.ParseRequest(w, r)
-	s := &usersmodule.UserService{}
-
-	users, err := s.GetUsers(c.Base.Db)
-	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
-	}
-
-	c.Base.CreateResponse(w, http.StatusOK, users)
-}
-
 // GetUser : Handler for getting user with given ID
 func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 
@@ -100,9 +92,14 @@ func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(&commons.Exception{M: commons.UserIDNotValid})
 	}
 
-	s := &usersmodule.UserService{}
+	s := &usersmodule.UserService{
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
+	}
 
-	user, err := s.GetUser(c.Base.Db, userID)
+	user, err := s.GetUser(userID)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}
@@ -115,9 +112,14 @@ func (c *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &usersmodule.UserService{}
+	s := &usersmodule.UserService{
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
+	}
 
-	userID, err := s.CreateUser(c.Base.Db, dto)
+	userID, err := s.CreateUser(dto)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}
@@ -130,9 +132,14 @@ func (c *UsersController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &usersmodule.UserService{}
+	s := &usersmodule.UserService{
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
+	}
 
-	err := s.UpdateUser(c.Base.Db, dto)
+	err := s.UpdateUser(dto)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}
@@ -145,9 +152,14 @@ func (c *UsersController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	dto := c.Base.ParseRequestToString(w, r)
 
-	s := &usersmodule.UserService{}
+	s := &usersmodule.UserService{
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
+	}
 
-	err := s.DeleteUser(c.Base.Db, dto)
+	err := s.DeleteUser(dto)
 	if err != nil {
 		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
 	}

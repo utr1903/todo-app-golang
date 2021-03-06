@@ -47,7 +47,6 @@ func initUserController(a *App) {
 
 	a.Router.HandleFunc("/users/SignIn", c.SignIn).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/CreateUser", c.CreateUser).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/users/GetUsers", commons.ValidateToken(c.GetUsers)).Methods("GET", "OPTIONS")
 	a.Router.HandleFunc("/users/GetUser", commons.ValidateToken(c.GetUser)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/UpdateUser", commons.ValidateToken(c.UpdateUser)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/users/DeleteUser", commons.ValidateToken(c.DeleteUser)).Methods("POST", "OPTIONS")
@@ -59,7 +58,6 @@ func initTodoListController(a *App) {
 
 	a.Router.HandleFunc("/lists/CreateList", commons.ValidateToken(c.CreateTodoList)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/GetLists", commons.ValidateToken(c.GetTodoLists)).Methods("GET", "OPTIONS")
-	a.Router.HandleFunc("/lists/GetList", commons.ValidateToken(c.GetTodoList)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/UpdateList", commons.ValidateToken(c.UpdateTodoList)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/lists/DeleteList", commons.ValidateToken(c.DeleteTodoList)).Methods("POST", "OPTIONS")
 }

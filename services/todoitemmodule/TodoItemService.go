@@ -16,10 +16,12 @@ import (
 // TodoItemService : Implementation of TodoItemService
 type TodoItemService struct {
 	Req *http.Request
+	Db  *sql.DB
+	Cu  *commons.CommonUtils
 }
 
 // GetTodoItems : Returns all items in the given list of user
-func (s *TodoItemService) GetTodoItems(db *sql.DB, listID *string) ([]dtos.GetTodoItems, error) {
+func (s *TodoItemService) GetTodoItems(listID *string) ([]dtos.GetTodoItems, error) {
 
 	userID, err := commons.ParseUserID(s.Req)
 	if err != nil {
@@ -27,13 +29,13 @@ func (s *TodoItemService) GetTodoItems(db *sql.DB, listID *string) ([]dtos.GetTo
 	}
 
 	// Check whether caller user exists
-	if !s.doesUserExist(db, userID) {
+	if !s.Cu.DoesUserExist(s.Db, userID) {
 		return nil, nil
 	}
 
 	q := "select Id, Content from items where ListId = ?"
 
-	rows, err := db.Query(q, listID)
+	rows, err := s.Db.Query(q, listID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +56,7 @@ func (s *TodoItemService) GetTodoItems(db *sql.DB, listID *string) ([]dtos.GetTo
 }
 
 // CreateTodoItem : Creates a new todo item
-func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, error) {
+func (s *TodoItemService) CreateTodoItem(dto *string) (*string, error) {
 
 	userID, err := commons.ParseUserID(s.Req)
 	if err != nil {
@@ -62,7 +64,7 @@ func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, erro
 	}
 
 	// Check whether caller user exists
-	if !s.doesUserExist(db, userID) {
+	if !s.Cu.DoesUserExist(s.Db, userID) {
 		return nil, nil
 	}
 
@@ -70,7 +72,7 @@ func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, erro
 	json.Unmarshal([]byte(*dto), &todoItem)
 
 	// Check whether to be created list is assigning to an existing user
-	if !s.doesListExist(db, &todoItem.ListID, userID) {
+	if !s.Cu.DoesListExist(s.Db, &todoItem.ListID, userID) {
 		return nil, nil
 	}
 
@@ -78,7 +80,7 @@ func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, erro
 	defer cancelfunc()
 
 	q := "insert into items (id, listid, content) values (?, ?, ?)"
-	stmt, err := db.PrepareContext(ctx, q)
+	stmt, err := s.Db.PrepareContext(ctx, q)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return nil, err
@@ -100,7 +102,7 @@ func (s *TodoItemService) CreateTodoItem(db *sql.DB, dto *string) (*string, erro
 }
 
 // UpdateTodoItem : Updates an existing todo item
-func (s *TodoItemService) UpdateTodoItem(db *sql.DB, dto *string) error {
+func (s *TodoItemService) UpdateTodoItem(dto *string) error {
 
 	userID, err := commons.ParseUserID(s.Req)
 	if err != nil {
@@ -108,7 +110,7 @@ func (s *TodoItemService) UpdateTodoItem(db *sql.DB, dto *string) error {
 	}
 
 	// Check whether caller user exists
-	if !s.doesUserExist(db, userID) {
+	if !s.Cu.DoesUserExist(s.Db, userID) {
 		return nil
 	}
 
@@ -116,7 +118,7 @@ func (s *TodoItemService) UpdateTodoItem(db *sql.DB, dto *string) error {
 	json.Unmarshal([]byte(*dto), &todoItem)
 
 	// Check whether to be updated item exists and belongs to the caller
-	if !s.doesItemExist(db, &todoItem.ID, userID) {
+	if !s.Cu.DoesItemExist(s.Db, &todoItem.ID, userID) {
 		return nil
 	}
 
@@ -124,7 +126,7 @@ func (s *TodoItemService) UpdateTodoItem(db *sql.DB, dto *string) error {
 	defer cancelfunc()
 
 	q := "update items set content = ? where id = ?"
-	stmt, err := db.PrepareContext(ctx, q)
+	stmt, err := s.Db.PrepareContext(ctx, q)
 	if err != nil {
 		log.Printf("Error %s when preparing SQL statement", err)
 		return err
@@ -153,12 +155,12 @@ func (s *TodoItemService) DeleteTodoItem(db *sql.DB, itemID *string) error {
 	}
 
 	// Check whether caller user exists
-	if !s.doesUserExist(db, userID) {
+	if !s.Cu.DoesUserExist(db, userID) {
 		return nil
 	}
 
 	// Check whether to be updated item exists and belongs to the caller
-	if !s.doesItemExist(db, itemID, userID) {
+	if !s.Cu.DoesItemExist(db, itemID, userID) {
 		return nil
 	}
 
@@ -184,40 +186,4 @@ func (s *TodoItemService) DeleteTodoItem(db *sql.DB, itemID *string) error {
 	}
 
 	return nil
-}
-
-func (s *TodoItemService) doesItemExist(db *sql.DB, itemID *string, userID *string) bool {
-	q := "select items.Id from items" +
-		" join lists on items.ListId = lists.Id" +
-		" where items.Id = ? and lists.UserId = ?"
-
-	var itemExists string
-	err := db.QueryRow(q, itemID, userID).Scan(&itemExists)
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
-func (s *TodoItemService) doesUserExist(db *sql.DB, userID *string) bool {
-	q := "select Id from users where Id = ?"
-	var userExists string
-	err := db.QueryRow(q, userID).Scan(&userExists)
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
-func (s *TodoItemService) doesListExist(db *sql.DB, listID *string, userID *string) bool {
-	q := "select Id from lists where Id = ? and UserId = ?"
-	var listExists string
-	err := db.QueryRow(q, listID, userID).Scan(&listExists)
-	if err != nil {
-		return false
-	}
-
-	return true
 }
