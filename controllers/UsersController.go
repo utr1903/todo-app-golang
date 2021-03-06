@@ -27,7 +27,7 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If the structure of the body is wrong, return an HTTP error
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(&commons.Exception{M: commons.RequestNotValid})
+		json.NewEncoder(w).Encode(commons.RequestNotValid())
 		return
 	}
 
@@ -42,7 +42,7 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	userID, err := s.CheckUser(&creds.UserName, &creds.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(&commons.Exception{M: commons.UserNotFound})
+		json.NewEncoder(w).Encode(commons.UserNotFound())
 		return
 	}
 
@@ -66,7 +66,7 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(&commons.Exception{M: commons.TokenNotValid})
+		json.NewEncoder(w).Encode(commons.TokenNotValid())
 		return
 	}
 
@@ -89,7 +89,7 @@ func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if !ok {
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(&commons.Exception{M: commons.UserIDNotValid})
+		json.NewEncoder(w).Encode(commons.UserIDNotValid())
 	}
 
 	s := &usersmodule.UserService{
@@ -121,7 +121,7 @@ func (c *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := s.CreateUser(dto)
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(w, http.StatusInternalServerError, nil)
 	}
 
 	c.Base.CreateResponse(w, http.StatusOK, userID)

@@ -2,25 +2,51 @@ package commons
 
 // Exception : For returning meaningful responses in case of failure
 type Exception struct {
-	M string
+	Code    string
+	Message string
+	Error   *error
 }
 
 // --- Not Found Exceptions ---
 
 // UserNotFound : User is not available in database
-var UserNotFound string = "User not found!"
+func UserNotFound() *Exception {
+	return &Exception{
+		Code:    "UserNotFound",
+		Message: "User not found!",
+		Error:   nil,
+	}
+}
 
 // ----------------------------
 
 // --- Not Valid Exceptions ---
 
 // RequestNotValid : Request structure is not in desired format
-var RequestNotValid string = "Request structure not valid!"
+func RequestNotValid() *Exception {
+	return &Exception{
+		Code:    "RequestNotValid",
+		Message: "Request structure not valid!",
+		Error:   nil,
+	}
+}
 
 // TokenNotValid : Token is not valid
-var TokenNotValid string = "Token not valid!"
+func TokenNotValid() *Exception {
+	return &Exception{
+		Code:    "TokenNotValid",
+		Message: "Token not valid!",
+		Error:   nil,
+	}
+}
 
 // UserIDNotValid : No User ID could be parsed from request
-var UserIDNotValid string = "User ID not valid!"
+func UserIDNotValid() *Exception {
+	return &Exception{
+		Code:    "UserIDNotValid",
+		Message: "User ID not valid!",
+		Error:   nil,
+	}
+}
 
 // ----------------------------

@@ -29,7 +29,6 @@ func (s *UserService) CreateUser(dto *string) (*string, error) {
 	q := "insert into users (id, username, password) values (?, ?, ?)"
 	stmt, err := s.Db.PrepareContext(ctx, q)
 	if err != nil {
-		log.Printf("Error %s when preparing SQL statement", err)
 		return nil, err
 	}
 	defer stmt.Close()
