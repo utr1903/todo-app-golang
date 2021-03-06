@@ -41,7 +41,7 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Declare the expiration time of the token
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(1 * time.Hour)
 
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &commons.Claims{
