@@ -71,25 +71,24 @@ func (c *UsersController) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set the client token
-	result := &commons.Token{
+	data := &commons.Token{
 		Token:      tokenString,
 		ExpireDate: expirationTime,
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(result)
+	result := commons.Success(data, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, result)
 }
 
 // GetUser : Handler for getting user with given ID
 func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToMap(w, r)
+	dto := c.Base.ParseRequestToMap(&w, r)
 	userID, ok := dto["userId"].(string)
 
-	w.Header().Set("Content-Type", "application/json")
 	if !ok {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(commons.UserIDNotValid())
+		result := commons.UserIDNotValid()
+		c.Base.CreateResponse(&w, http.StatusOK, result)
 	}
 
 	s := &usersmodule.UserService{
@@ -101,16 +100,17 @@ func (c *UsersController) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := s.GetUser(userID)
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, user)
+	result := commons.Success(user, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, result)
 }
 
 // CreateUser : Handler for creating new user
 func (c *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
 	s := &usersmodule.UserService{
 		Cu: &commons.CommonUtils{
@@ -121,16 +121,17 @@ func (c *UsersController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := s.CreateUser(dto)
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusInternalServerError, nil)
+		c.Base.CreateResponse(&w, http.StatusInternalServerError, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, userID)
+	result := commons.Success(userID, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, result)
 }
 
 // UpdateUser : Handler for updating an existing user
 func (c *UsersController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
 	s := &usersmodule.UserService{
 		Cu: &commons.CommonUtils{
@@ -141,16 +142,16 @@ func (c *UsersController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	err := s.UpdateUser(dto)
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, nil)
 }
 
 // DeleteUser : Handler for deleting an existing user
 func (c *UsersController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
 	s := &usersmodule.UserService{
 		Cu: &commons.CommonUtils{
@@ -161,8 +162,8 @@ func (c *UsersController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	err := s.DeleteUser(dto)
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, nil)
 }

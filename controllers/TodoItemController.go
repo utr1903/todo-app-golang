@@ -15,7 +15,7 @@ type TodoItemController struct {
 // GetTodoItems : Handler for getting all todo items
 func (c *TodoItemController) GetTodoItems(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
 	s := &todoitemmodule.TodoItemService{
 		Req: r,
@@ -28,16 +28,17 @@ func (c *TodoItemController) GetTodoItems(w http.ResponseWriter, r *http.Request
 	items, err := s.GetTodoItems(dto)
 
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, items)
+	result := commons.Success(items, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, result)
 }
 
 // CreateTodoItem : Handler for creating a new item
 func (c *TodoItemController) CreateTodoItem(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
 	s := &todoitemmodule.TodoItemService{
 		Req: r,
@@ -49,16 +50,17 @@ func (c *TodoItemController) CreateTodoItem(w http.ResponseWriter, r *http.Reque
 
 	itemID, err := s.CreateTodoItem(dto)
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, itemID)
+	result := commons.Success(itemID, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, result)
 }
 
 // UpdateTodoItem : Handler for updating an existing item
 func (c *TodoItemController) UpdateTodoItem(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
 	s := &todoitemmodule.TodoItemService{
 		Req: r,
@@ -70,16 +72,16 @@ func (c *TodoItemController) UpdateTodoItem(w http.ResponseWriter, r *http.Reque
 
 	err := s.UpdateTodoItem(dto)
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, nil)
 }
 
 // DeleteTodoItem : Handler for deleting an existing item
 func (c *TodoItemController) DeleteTodoItem(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
 	s := &todoitemmodule.TodoItemService{
 		Req: r,
@@ -91,8 +93,8 @@ func (c *TodoItemController) DeleteTodoItem(w http.ResponseWriter, r *http.Reque
 
 	err := s.DeleteTodoItem(c.Base.Db, dto)
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, nil)
 }

@@ -15,7 +15,7 @@ type TodoListController struct {
 // CreateTodoList : Handler for creating a new list
 func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
 	s := &todolistmodule.TodoListService{
 		Req: r,
@@ -27,10 +27,11 @@ func (c *TodoListController) CreateTodoList(w http.ResponseWriter, r *http.Reque
 	listID, err := s.CreateTodoList(dto)
 
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, listID)
+	result := commons.Success(listID, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, result)
 }
 
 // GetTodoLists : Handler for all todo lists
@@ -47,36 +48,51 @@ func (c *TodoListController) GetTodoLists(w http.ResponseWriter, r *http.Request
 	lists, err := s.GetTodoLists()
 
 	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, lists)
+	result := commons.Success(lists, nil)
+	c.Base.CreateResponse(&w, http.StatusOK, result)
 }
 
 // UpdateTodoList : Handler for updating an existing list
 func (c *TodoListController) UpdateTodoList(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
-	s := &todolistmodule.TodoListService{Req: r}
-	err := s.UpdateTodoList(dto)
-	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	s := &todolistmodule.TodoListService{
+		Req: r,
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, nil)
+	err := s.UpdateTodoList(dto)
+	if err != nil {
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(&w, http.StatusOK, nil)
 }
 
 // DeleteTodoList : Handler for deleting an existing list
 func (c *TodoListController) DeleteTodoList(w http.ResponseWriter, r *http.Request) {
 
-	dto := c.Base.ParseRequestToString(w, r)
+	dto := c.Base.ParseRequestToString(&w, r)
 
-	s := &todolistmodule.TodoListService{Req: r}
-	err := s.DeleteTodoList(dto)
-	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
+	s := &todolistmodule.TodoListService{
+		Req: r,
+		Cu: &commons.CommonUtils{
+			Db: c.Base.Db,
+		},
+		Db: c.Base.Db,
 	}
 
-	c.Base.CreateResponse(w, http.StatusOK, nil)
+	err := s.DeleteTodoList(dto)
+	if err != nil {
+		c.Base.CreateResponse(&w, http.StatusBadRequest, nil)
+	}
+
+	c.Base.CreateResponse(&w, http.StatusOK, nil)
 }
