@@ -127,7 +127,7 @@ func (s *TodoListService) UpdateTodoList(db *sql.DB, dto *string) error {
 	todoList := &dtos.TodoList{}
 	json.Unmarshal([]byte(*dto), &todoList)
 
-	// Check whether to be updated list exists
+	// Check whether to be updated list exists and belongs to the caller
 	if !s.doesListExist(db, &todoList.ID, userID) {
 		return nil
 	}
@@ -172,7 +172,7 @@ func (s *TodoListService) DeleteTodoList(db *sql.DB, dto *string) error {
 	var listID string
 	json.Unmarshal([]byte(*dto), &listID)
 
-	// Check whether to be deleted list exists and belongs to the caller
+	// Check whether to be updated list exists and belongs to the caller
 	if !s.doesListExist(db, &listID, userID) {
 		return nil
 	}

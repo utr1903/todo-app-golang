@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/todo-app-golang/services/todoitemmodule"
@@ -25,26 +24,6 @@ func (c *TodoItemController) GetTodoItems(w http.ResponseWriter, r *http.Request
 	}
 
 	c.Base.CreateResponse(w, http.StatusOK, items)
-}
-
-// GetTodoItem : Handler for getting an item with given ID
-func (c *TodoItemController) GetTodoItem(w http.ResponseWriter, r *http.Request) {
-
-	dto := c.Base.ParseRequestToMap(w, r)
-	itemID, ok := dto["itemId"].(string)
-
-	if !ok {
-		log.Fatal("ItemID is not valid")
-	}
-
-	s := &todoitemmodule.TodoItemService{Req: r}
-
-	item, err := s.GetItem(c.Base.Db, itemID)
-	if err != nil {
-		c.Base.CreateResponse(w, http.StatusBadRequest, nil)
-	}
-
-	c.Base.CreateResponse(w, http.StatusOK, item)
 }
 
 // CreateTodoItem : Handler for creating a new item

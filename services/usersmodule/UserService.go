@@ -90,7 +90,7 @@ func (s *UserService) UpdateUser(db *sql.DB, dto *string) error {
 	user := &dtos.User{}
 	json.Unmarshal([]byte(*dto), &user)
 
-	// Check whether to be created list is assigning to an existing user
+	// Check whether to be updated user exists
 	if !s.doesUserExist(db, &user.ID) {
 		return nil
 	}
@@ -125,7 +125,7 @@ func (s *UserService) DeleteUser(db *sql.DB, dto *string) error {
 	var userID string
 	json.Unmarshal([]byte(*dto), &userID)
 
-	// Check whether to be created list is assigning to an existing user
+	// Check whether to be deleted user exists
 	if !s.doesUserExist(db, &userID) {
 		return nil
 	}

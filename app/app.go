@@ -70,7 +70,6 @@ func initTodoItemController(a *App) {
 
 	a.Router.HandleFunc("/items/CreateItem", commons.ValidateToken(c.CreateTodoItem)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/items/GetItems", commons.ValidateToken(c.GetTodoItems)).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/items/GetItem", commons.ValidateToken(c.GetTodoItem)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/items/UpdateItem", commons.ValidateToken(c.UpdateTodoItem)).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/items/DeleteItem", commons.ValidateToken(c.DeleteTodoItem)).Methods("POST", "OPTIONS")
 }
