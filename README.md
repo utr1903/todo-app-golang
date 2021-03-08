@@ -3,6 +3,8 @@
 ## 1. Introduction
 Well, at the time of making this project, I was kind of a newbie in Golang. So the purpose was to learn how to code a API backend with Go. For other newbies in this matter, I hope that this project can help.
 
+In addition to this project, I have started another one called "todo-app-frontend". Since I was also a newbie in Angular, that one was also meant to learn a couple of stuff. Long story short, you can run both frontend and backend codes to see how it actually looks like.
+
 ## 2. Setting up GO environment
 Unlike other common languages, Go has one specific working directory which has to be defined in the environment variable $GOPATH. It should contain 3 typical folders inside: bin, pkg and src.
 
@@ -27,5 +29,7 @@ Click _New_. Type _GOPATH_ for variable name and type _your working directory_ f
 - https://www.callicoder.com/golang-installation-setup-gopath-workspace/
 - https://medium.com/rungo/working-in-go-workspace-3b0576e0534a
 
+## 3. Requirements
+### 3.1 MySql Database
 
 
